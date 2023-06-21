@@ -119,6 +119,9 @@ python main.py -l c -m gpt-4-0314 -t md4c -f md_html -q ITER-BA -MI 20 -MR 3 -o 
 - Read summary from command line output (coming soon)
 - View whole taxonomized detail in local website (coming soon)
 
+### Tested APIs
+
+[Tested APIs](https://github.com/occia/fuzzdrivergpt/tree/main/doc/tested_apis.md) provides a list of `-t` & `-f` options for try.
 
 # Technical Overview
 
