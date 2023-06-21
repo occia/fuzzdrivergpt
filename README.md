@@ -12,16 +12,16 @@ Currently, `fuzzdrivergpt`:
 
 The query strategies haven been tested on 86 APIs from 30 C projects of oss-fuzz, and some strategies can generate effective drivers for 78 (91%) of them with manually refined validation criteria.
 
-## Video demo
+## Demo
 
-The following video shows the process of using iterative query strategy to generate valid fuzz drivers for `md_html` from project `md4c`.
+The following demo shows the process of using iterative query strategy to generate valid fuzz drivers for `md_html` from project `md4c`.
 `fuzzdrivergpt` generated a fuzz driver with compilation error in the first iteration, then it fixed that error in the following iteration using code fix prompts.
 
 ![video demo](doc/demo/demo.svg)
 
 ## Generated fuzz drivers
 
-See [`examples`](https://github.com/occia/fuzzdrivergpt/tree/main/examples).
+[`examples`](https://github.com/occia/fuzzdrivergpt/tree/main/examples) provide some `fuzzdrivergpt` generated drivers using iterative query strategies.
 
 
 # Usage Guidance
@@ -44,7 +44,7 @@ OPENAI_ORGID = your-orgid
 wget https://download.java.net/java/GA/jdk19.0.2/fdb695a9d9064ad6b064dc6df578380c/7/GPL/openjdk-19.0.2_linux-x64_bin.tar.gz
 tar xf openjdk-19.0.2_linux-x64_bin.tar.gz
 mv jdk-19.0.2 tools/
-# remove the downloed if you want
+# remove the download if you want
 rm openjdk-19.0.2_linux-x64_bin.tar.gz
 ```
 
@@ -176,7 +176,7 @@ MIT License, see LICENSE.txt.
 
 # I Want to Contribute!
 
-Feel free to file an issue for suggestion, contribution, or discussion for `fuzzdrivergpt`.
+Any suggestion, contribution, or discussion for `fuzzdrivergpt` is highly appreciated.
 
 Contributors:
 - [Cen Zhang](https://www.github.com/occia)
