@@ -1,0 +1,14 @@
+brotli:
+  language: "c"
+  image: "fuzzdrivergpt/brotli:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "brotli/decode.h"\n#include "brotli/encode.h"\n#include "brotli/port.h"\n#include "brotli/shared_dictionary.h"\n#include "brotli/types.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libbrotlicommon.a","/root/workspace/fuzzdrivergpt/install/lib/libbrotlidec.a","/root/workspace/fuzzdrivergpt/install/lib/ libbrotlienc.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-c","-std=c99" ]
+  build: "COMPBASE OUTFILE  /src/brotli/libbrotlicommon.a  /src/brotli/libbrotlidec.a /src/brotli/libbrotlienc.a  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/brotli/c/fuzz/decode_fuzzer.c","/src/brotli/c/fuzz/run_decode_fuzzer.c" ]
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -c -std=c99 -I. -I./c/include /src/brotli/c/fuzz/decode_fuzzer.c
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ ./decode_fuzzer.o -o /out/decode_fuzzer -fsanitize=fuzzer ./libbrotlidec.a ./libbrotlicommon.a

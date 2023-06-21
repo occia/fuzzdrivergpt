@@ -1,0 +1,15 @@
+zlib:
+  language: "c"
+  image: "fuzzdrivergpt/zlib:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libz.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /src/zlib/libz.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/checksum_fuzzer.c","/src/compress_fuzzer.c","/src/example_dict_fuzzer.c","/src/example_flush_fuzzer.c","/src/example_large_fuzzer.c","/src/example_small_fuzzer.c","/src/libfuzzer","/src/minigzip_fuzzer.c","/src/zlib_uncompress2_fuzzer.cc","/src/zlib_uncompress_fuzzer.cc" ]
+
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -I. /src/compress_fuzzer.c -c -o /tmp/compress_fuzzer.o
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -o /out/compress_fuzzer /tmp/compress_fuzzer.o -stdlib=libc++ -fsanitize=fuzzer ./libz.a

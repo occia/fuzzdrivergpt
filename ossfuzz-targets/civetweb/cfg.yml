@@ -1,0 +1,14 @@
+civetweb:
+  language: "c"
+  image: "fuzzdrivergpt/civetweb:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/civetweb.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-O1", "-fno-omit-frame-pointer", "-gline-tables-only", "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION", "-fsanitize=address", "-fsanitize-address-use-after-scope", "-fsanitize=fuzzer-no-link", "-fsanitize=fuzzer", "-Wall", "-Wextra", "-Wshadow", "-Wformat-security", "-Winit-self", "-Wmissing-prototypes", "-DLINUX", "-I/root/workspace/fuzzdrivergpt/install/include", "-DUSE_STACK_SIZE=102400", "-DTEST_FUZZ1", "-DOPENSSL_API_1_1" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libcivetweb.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/civetweb/fuzztest/fuzzmain.c" ]
+
+
+#clang -c -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Wall -Wextra -Wshadow -Wformat-security -Winit-self -Wmissing-prototypes -DLINUX -Iinclude  -DUSE_STACK_SIZE=102400 -DTEST_FUZZ1 -DOPENSSL_API_1_1 fuzztest/fuzzmain.c -o out/fuzztest/fuzzmain.o

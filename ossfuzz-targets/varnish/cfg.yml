@@ -1,0 +1,23 @@
+varnish:
+  language: "c"
+  image: "fuzzdrivergpt/varnish:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include/varnish" : "**/*" }
+  binaries: [ "/src/varnish-cache/lib/libvarnish/.libs/libvarnish.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-I/src/varnishi-cache/include","-I/src/varnishi-cache/lib/libvgz","-I/src/varnishi-cache/lib/libvsc","-I/src/varnishi-cache/libvcc","-I/src/varnishi-cache/bin/varnishd","-DNOT_IN_A_VMOD","-DENABLE_WORKSPACE_EMULATOR","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-DZ_PREFIX","-pthread","-Wall","-Werror","-Wno-error=unused-result" ]
+  build: "COMPBASE OUTFILE -o OUTEXE /src/varnish-cache/lib/libvarnish/.libs/libvarnish.a -l:libpcre2-8.a -lnsl -lrt -lm /src/varnish-cache/lib/libvgz/.libs/libvgz.a "
+  # seems the following are not necessary
+  #-L/root/workspace/fuzzdrivergpt/install/lib/varnish/vmods -lvmod_blob -lvmod_cookie -lvmod_debug -lvmod_directors -lvmod_proxy -lvmod_purge -lvmod_std -lvmod_unix -lvmod_vtc"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/varnish-cache/bin/varnishd/fuzzers/esi_parse_fuzzer.c" ]
+
+
+
+
+#clang -DHAVE_CONFIG_H -I. -I../..  -I../../include -I../../lib/libvgz -I../../bin/varnishd -I../../include -I../../lib/libvsc  -DNOT_IN_A_VMOD -DENABLE_WORKSPACE_EMULATOR  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -DZ_PREFIX -pthread -Wall -Werror -Wno-error=unused-result -MT fuzzers/esi_parse_fuzzer-esi_parse_fuzzer.o -MD -MP -MF fuzzers/.deps/esi_parse_fuzzer-esi_parse_fuzzer.Tpo -c -o fuzzers/esi_parse_fuzzer-esi_parse_fuzzer.o `test -f 'fuzzers/esi_parse_fuzzer.c' || echo './'`fuzzers/esi_parse_fuzzer.c
+#mv -f fuzzers/.deps/esi_parse_fuzzer-esi_parse_fuzzer.Tpo fuzzers/.deps/esi_parse_fuzzer-esi_parse_fuzzer.Po
+#mv -f cache/.deps/esi_parse_fuzzer-cache_esi_parse.Tpo cache/.deps/esi_parse_fuzzer-cache_esi_parse.Po
+#/bin/bash ../../libtool  --tag=CC   --mode=link clang -DNOT_IN_A_VMOD -DENABLE_WORKSPACE_EMULATOR  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -DZ_PREFIX -pthread -Wall -Werror -Wno-error=unused-result /usr/lib/libFuzzingEngine.a  -o esi_parse_fuzzer cache/esi_parse_fuzzer-cache_ws_emu.o cache/esi_parse_fuzzer-cache_ws_common.o cache/esi_parse_fuzzer-cache_esi_parse.o fuzzers/esi_parse_fuzzer-esi_parse_fuzzer.o ../../lib/libvarnish/libvarnish.la ../../lib/libvgz/libvgz.la
+#libtool: link: clang -DNOT_IN_A_VMOD -DENABLE_WORKSPACE_EMULATOR -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -DZ_PREFIX -pthread -Wall -Werror -Wno-error=unused-result -o esi_parse_fuzzer cache/esi_parse_fuzzer-cache_ws_emu.o cache/esi_parse_fuzzer-cache_ws_common.o cache/esi_parse_fuzzer-cache_esi_parse.o fuzzers/esi_parse_fuzzer-esi_parse_fuzzer.o  /usr/lib/libFuzzingEngine.a ../../lib/libvarnish/.libs/libvarnish.a -l:libpcre2-8.a -lm ../../lib/libvgz/.libs/libvgz.a -pthread
+

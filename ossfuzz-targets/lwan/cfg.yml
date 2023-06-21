@@ -1,0 +1,22 @@
+lwan:
+  language: "c"
+  image: "fuzzdrivergpt/lwan:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "lwan/lwan.h"\n#include "lwan/hash.h"\n#include "lwan/lwan-config.h"\n#include "lwan/lwan-mod-response.h"\n#include "lwan/lwan-strbuf.h"\n#include "lwan/timeout.h"\n#include "lwan/list.h"\n#include "lwan/lwan-coro.h"\n#include "lwan/lwan-mod-rewrite.h"\n#include "lwan/lwan-template.h"\n#include "lwan/lwan-array.h"\n#include "lwan/lwan-mod-lua.h"\n#include "lwan/lwan-mod-serve-files.h"\n#include "lwan/lwan-trie.h"\n#include "lwan/lwan-build-config.h"\n#include "lwan/lwan-mod-redirect.h"\n#include "lwan/lwan-status.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/liblwan.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-Wl,-whole-archive","-Wl,-no-whole-archive"]
+  build: "COMPBASE OUTFILE /work/lwan/src/lib/liblwan.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/lwan/src/bin/fuzz/request_fuzzer.cc","/src/lwan/src/bin/fuzz/template_fuzzer.cc" ]
+
+
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Wl,-whole-archive -Wl,-no-whole-archive /work/lwan/src/lib/liblwan.a  -I/src/lwan/src/lib /src/lwan/src/bin/fuzz/request_fuzzer.cc -fsanitize=fuzzer -lpthread -lz -o /out/request_fuzzer
+#+ for fuzzer in $SRC/lwan/src/bin/fuzz/*_fuzzer.cc
+#++ basename /src/lwan/src/bin/fuzz/template_fuzzer.cc .cc
+#+ executable=template_fuzzer
+#++ basename /src/lwan/src/bin/fuzz/template_fuzzer.cc _fuzzer.cc
+#+ corpus_base=template
+#+ zip -jr /out/template_fuzzer_seed_corpus.zip /src/lwan/fuzz/corpus/corpus-template-1
+#  adding: corpus-template-1 (deflated 63%)
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 -Wl,-whole-archive /work/lwan/src/lib/liblwan.a -Wl,-no-whole-archive -I/src/lwan/src/lib /src/lwan/src/bin/fuzz/template_fuzzer.cc -fsanitize=fuzzer -lpthread -lz -o /out/template_fuzzer

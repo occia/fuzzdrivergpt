@@ -1,0 +1,14 @@
+libvips:
+  language: "c"
+  image: "fuzzdrivergpt/libvips:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "vips/vips.h"\n'
+  headers: { "/work/include" : "vips/*" }
+  binaries: [ "/work/lib/libvips.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/work/include","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/usr/include/glib-2.0","-I/usr/lib/x86_64-linux-gnu/glib-2.0/include","-L/work/lib","-fsanitize=fuzzer"]
+  build: "COMPBASE OUTFILE -lvips -lexif -llcms2 -ljpeg -lpng -lspng -lz -ltiff -lwebpmux -lwebpdemux -lwebp -lsharpyuv -lheif -laom -limagequant -lcgif /work/lib/libpdfium.so -Wl,-Bstatic -lfftw3 -lexpat -lgio-2.0 -lgmodule-2.0 -lgobject-2.0 -lffi -lglib-2.0 -lresolv -lmount -lblkid -lselinux -lsepol -lpcre -Wl,-Bdynamic -pthread -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ['/src/libvips/fuzz/gifsave_buffer_fuzzer.cc', '/src/libvips/fuzz/mosaic_fuzzer.cc', '/src/libvips/fuzz/smartcrop_fuzzer.cc', '/src/libvips/fuzz/jpegsave_buffer_fuzzer.cc', '/src/libvips/fuzz/pngsave_buffer_fuzzer.cc', '/src/libvips/fuzz/thumbnail_fuzzer.cc', '/src/libvips/fuzz/jpegsave_file_fuzzer.cc', '/src/libvips/fuzz/sharpen_fuzzer.cc', '/src/libvips/fuzz/webpsave_buffer_fuzzer.cc']
+
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 fuzz/gifsave_buffer_fuzzer.cc -o /out/gifsave_buffer_fuzzer -I/work/include -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -L/work/lib -lvips -lexif -llcms2 -ljpeg -lpng -lspng -lz -ltiff -lwebpmux -lwebpdemux -lwebp -lsharpyuv -lheif -laom -limagequant -lcgif -lpdfium -fsanitize=fuzzer -Wl,-Bstatic -lfftw3 -lexpat -lgio-2.0 -lgmodule-2.0 -lgobject-2.0 -lffi -lglib-2.0 -lresolv -lmount -lblkid -lselinux -lsepol -lpcre -Wl,-Bdynamic -pthread '-Wl,-rpath,$ORIGIN/lib'

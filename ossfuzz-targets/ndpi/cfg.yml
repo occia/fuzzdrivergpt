@@ -1,0 +1,17 @@
+ndpi:
+  language: "c"
+  image: "fuzzdrivergpt/ndpi:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "ndpi/ndpi_main.h"\n#include "ndpi/ndpi_patricia_typedefs.h"\n#include "ndpi/ndpi_unix.h"\n#include "ndpi/ndpi_utils.h"\n#include "ndpi/ndpi_config.h"\n#include "ndpi/ndpi_classify.h"\n#include "ndpi/ndpi_encryption.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libndpi.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DHAVE_CONFIG_H","-Wno-attributes","-W","-Wall","-Wno-unused-parameter","-Wno-unused-function","-Wno-address-of-packed-member","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-Wno-attributes","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-fsanitize=fuzzer","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE -lpcap /src/ndpi/src/lib/libndpi.a -lm -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ['/src/ndpi/fuzz/fuzz_alg_bins.cpp', '/src/ndpi/fuzz/fuzz_community_id.cpp', '/src/ndpi/fuzz/fuzz_ds_ptree.cpp', '/src/ndpi/fuzz/fuzz_alg_hll.cpp', '/src/ndpi/fuzz/fuzz_config.cpp', '/src/ndpi/fuzz/fuzz_ds_tree.cpp', '/src/ndpi/fuzz/fuzz_alg_hw_rsi_outliers_da.cpp', '/src/ndpi/fuzz/fuzz_ds_ahocorasick.cpp', '/src/ndpi/fuzz/fuzz_serialization.cpp', '/src/ndpi/fuzz/fuzz_alg_jitter.cpp', '/src/ndpi/fuzz/fuzz_ds_libcache.cpp', '/src/ndpi/fuzz/fuzz_alg_ses_des.cpp', '/src/ndpi/fuzz/fuzz_ds_patricia.cpp']
+
+
+
+#clang++ -DHAVE_CONFIG_H    -Wno-attributes -W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-address-of-packed-member  -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -Wno-attributes -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -MT fuzz_serialization-fuzz_serialization.o -MD -MP -MF .deps/fuzz_serialization-fuzz_serialization.Tpo -c -o fuzz_serialization-fuzz_serialization.o `test -f 'fuzz_serialization.cpp' || echo './'`fuzz_serialization.cpp
+#
+#libtool: link: clang++ -Wno-attributes -W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-address-of-packed-member -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -Wno-attributes -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer -o fuzz_serialization fuzz_serialization-fuzz_serialization.o fuzz_serialization-fuzz_common_code.o  -lpcap ../src/lib/libndpi.a -lm

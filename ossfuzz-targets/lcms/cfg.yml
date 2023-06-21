@@ -1,0 +1,14 @@
+lcms:
+  language: "c"
+  image: "fuzzdrivergpt/lcms:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "lcms2.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/lcms.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /src/lcms/src/.libs/liblcms2.a -lm -lpthread -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/cmsIT8_load_fuzzer.c","/src/cms_overwrite_transform_fuzzer.c","/src/cms_profile_fuzzer.c","/src/cms_transform_all_fuzzer.c","/src/cms_transform_extended_fuzzer.c","/src/cms_transform_fuzzer.c","/src/cms_universal_transform_fuzzer.c" ]
+
+
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ /src/cms_universal_transform_fuzzer.o -o /out/cms_universal_transform_fuzzer -fsanitize=fuzzer src/.libs/liblcms2.a

@@ -1,0 +1,13 @@
+sleuthkit:
+  language: "c"
+  image: "fuzzdrivergpt/sleuthkit:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include"tsk/libtsk.h"\n#include"tsk/tsk_incs.h"\n#include"tsk/pool/tsk_apfs.h"\n#include"tsk/util/detect_encryption.h"\n#include"tsk/util/file_system_utils.h"\n#include"tsk/vs/tsk_dos.h"\n#include"tsk/vs/tsk_mac.h"\n#include"tsk/vs/tsk_gpt.h"\n#include"tsk/vs/tsk_bsd.h"\n#include"tsk/vs/tsk_sun.h"\n#include"tsk/img/logical_img.h"\n#include"tsk/base/tsk_os.h"\n#include"tsk/fs/tsk_exfatfs.h"\n#include"tsk/fs/tsk_yaffs.h"\n#include"tsk/fs/tsk_fatxxfs.h"\n#include"tsk/fs/tsk_logical_fs.h"\n#include"tsk/fs/tsk_apfs.h"\n#include"tsk/fs/tsk_ffs.h"\n#include"tsk/fs/tsk_fs.h"\n#include"tsk/fs/tsk_ntfs.h"\n#include"tsk/fs/apfs_fs.h"\n#include"tsk/fs/tsk_fatfs.h"\n#include"tsk/fs/decmpfs.h"\n#include"tsk/fs/tsk_ext2fs.h"\n#include"tsk/fs/tsk_hfs.h"\n#include"tsk/fs/tsk_iso9660.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libtsk.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-Wno-error=non-c-typedef-for-linkage","-I/src/sleuthkit","-I/src/sleuthkit/tsk/fs"  ]
+  build: "COMPBASE OUTFILE /src/sleuthkit/tsk/.libs/libtsk.a -lz -ldl  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/sleuthkit_fls_apfs_fuzzer.cc",  "/src/sleuthkit_fls_fuzzer.cc",  "/src/sleuthkit_mmls_fuzzer.cc"   ]
+#
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link  -Wno-error=non-c-typedef-for-linkage   -I.. -I. -Itsk /src/sleuthkit_fls_apfs_fuzzer.cc -o /out/sleuthkit_fls_apfs_fuzzer -fsanitize=fuzzer

@@ -1,0 +1,19 @@
+lldpd:
+  language: "c"
+  image: "fuzzdrivergpt/lldpd:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { 
+    "/root/workspace/fuzzdrivergpt/install/include" : "**/*",
+  }
+  binaries: [
+    "/root/workspace/fuzzdrivergpt/install/lib/liblldpctl.a",
+    "/src/lldpd/src/daemon/.libs/liblldpd.a"
+  ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-fPIE","-Wall","-Werror","-pipe","-DHAVE_CONFIG_H" ]
+  build: "COMPBASE OUTFILE /src/lldpd/src/daemon/.libs/liblldpd.a /root/workspace/fuzzdrivergpt/install/lib/liblldpctl.a /src/lldpd/libevent/.libs/libevent.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/lldpd/FuzzDecode.c" ]
+
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fPIE -Wall -Werror -pipe -DHAVE_CONFIG_H -I. -I include/ -c FuzzDecode.c                                                                    + clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fPIE -pie -o FuzzDecode FuzzDecode.o -fsanitize=fuzzer src/daemon/.libs/liblldpd.a libevent/.libs/libevent.a

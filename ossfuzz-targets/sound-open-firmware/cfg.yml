@@ -1,0 +1,17 @@
+sound-open-firmware:
+  language: "c"
+  image: "fuzzdrivergpt/sound-open-firmware:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/src/sof/tools/oss-fuzz/build_oss_fuzz/sof_ep/install/include" : "**/*.h" }
+  binaries: [ "/src/sof/tools/oss-fuzz/build_oss_fuzz/sof_ep/install/lib/libsof.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include","-I/src/sof/tools/oss-fuzz/build_oss_fuzz/sof_ep/install/include","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-g","-O3","-Wall","-Werror","-Wmissing-prototypes","-Wimplicit-fallthrough","-DCONFIG_LIBRARY","-i/src/sof/tools/oss-fuzz/build_oss_fuzz/sof_ep/build/library_autoconfig.h" ]
+  build: "COMPBASE OUTFILE -Wl,-rpath,::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -ldl -lm /src/sof/tools/oss-fuzz/build_oss_fuzz/sof_ep/install/lib/libsof.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/sof/tools/oss-fuzz/fuzz_ipc.c" ]
+
+#build.sh install files to /src/sof/tools/oss-fuzz/build_oss_fuzz/sof_ep/install
+
+#clang  -DRELATIVE_FILE=\"fuzz_ipc.c\" -I/src/sof/tools/oss-fuzz/build_oss_fuzz/sof_ep/install/include -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -g -O3 -Wall -Werror -Wmissing-prototypes -Wimplicit-fallthrough -DCONFIG_LIBRARY -imacros/src/sof/tools/oss-fuzz/build_oss_fuzz/sof_ep/build/library_autoconfig.h -MD -MT CMakeFiles/fuzz_ipc.dir/fuzz_ipc.c.o -MF CMakeFiles/fuzz_ipc.dir/fuzz_ipc.c.o.d -o CMakeFiles/fuzz_ipc.dir/fuzz_ipc.c.o -c /src/sof/tools/oss-fuzz/fuzz_ipc.c
+#
+#/usr/local/bin/clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer CMakeFiles/fuzz_ipc.dir/fuzz_ipc.c.o -o /out/fuzz_ipc  -Wl,-rpath,::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -ldl -lm sof_ep/install/lib/libsof.a

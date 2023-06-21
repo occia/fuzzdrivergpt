@@ -1,0 +1,13 @@
+gpac:
+  language: "c"
+  image: "fuzzdrivergpt/gpac:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libgpac_static.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DGPAC_HAVE_CONFIG_H", "-I/src/gpac" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libgpac_static.a -lm -lz -lpthread -lssl -lcrypto -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/testsuite/oss-fuzzers/fuzz_parse.c" ]
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer fuzz_parse.c -o /out/fuzz_parse -I./include -I./ ./bin/gcc/libgpac_static.a -lm -lz -lpthread -lssl -lcrypto -DGPAC_HAVE_CONFIG_H

@@ -1,0 +1,16 @@
+unbound:
+  language: "c"
+  image: "fuzzdrivergpt/unbound:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libunbound.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-DVALGRIND=1","-I/src/unbound","-DSRCDIR=/src/unbound" ]
+  build: "COMPBASE OUTFILE -lssl -lcrypto -pthread /root/workspace/fuzzdrivergpt/install/lib/libunbound.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/unbound/fuzz_1.c", "/src/unbound/fuzz_2.c","/src/unbound/fuzz_3.c","/src/unbound/fuzz_4.c","/src/unbound/parse_packet_fuzzer.c"]
+
+#-O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -DVALGRIND=1 -I/src/unbound -DSRCDIR=/src/unbound
+#
+#
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 -fsanitize=fuzzer -lssl -lcrypto -pthread -o /out/fuzz_1_fuzzer fuzz_1.o dns.o infra.o rrset.o dname.o msgencode.o as112.o msgparse.o msgreply.o packed_rrset.o iterator.o iter_delegpt.o iter_donotq.o iter_fwd.o iter_hints.o iter_priv.o iter_resptype.o iter_scrub.o iter_utils.o localzone.o mesh.o modstack.o view.o outbound_list.o alloc.o config_file.o configlexer.o configparser.o fptr_wlist.o edns.o locks.o log.o mini_event.o module.o net_help.o random.o rbtree.o regional.o rtt.o dnstree.o lookup3.o lruhash.o slabhash.o tcp_conn_limit.o timehist.o tube.o winsock_event.o autotrust.o val_anchor.o validator.o val_kcache.o val_kentry.o val_neg.o val_nsec3.o val_nsec.o val_secalgo.o val_sigcrypt.o val_utils.o dns64.o authzone.o respip.o netevent.o listen_dnsport.o outside_network.o ub_event.o keyraw.o sbuffer.o wire2str.o parse.o parseutil.o rrdef.o str2wire.o libunbound.o libworker.o context.o rpz.o proxy_protocol.o strlcat.o strlcpy.o arc4random.o arc4random_uniform.o arc4_lock.o

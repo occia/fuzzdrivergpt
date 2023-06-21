@@ -1,0 +1,13 @@
+libexif:
+  language: "c"
+  image: "fuzzdrivergpt/libexif:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include <assert.h>\n#include "libexif/exif-data-type.h"\n#include "libexif/exif-format.h"\n#include "libexif/exif-log.h"\n#include "libexif/exif-tag.h"\n#include "libexif/exif-byte-order.h"\n#include "libexif/exif-data.h"\n#include "libexif/exif-ifd.h"\n#include "libexif/exif-mem.h"\n#include "libexif/exif-utils.h"\n#include "libexif/exif-content.h"\n#include "libexif/exif-entry.h"\n#include "libexif/exif-loader.h"\n#include "libexif/exif-mnote-data.h"\n'
+  headers: { "/work/include" : "**/*" }
+  binaries: [ "/work/lib/libexif.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/work/include" ]
+  build: "COMPBASE OUTFILE /work/lib/libexif.a -lm -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/exif_from_data_fuzzer.cc","/src/exif_loader_fuzzer.cc" ]
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 -I/work/include /src/exif_from_data_fuzzer.cc -o /out/exif_from_data_fuzzer -fsanitize=fuzzer /work/lib/libexif.a

@@ -1,0 +1,19 @@
+apache-httpd:
+  language: "c"
+  image: "fuzzdrivergpt/apache-httpd:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libapr-2.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include" ]
+  build: "COMPBASE OUTFILE -luuid -lcrypt -lexpat -l:libbsd.a /src/pcre2/.libs/libpcre2-8.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-
+#no-link -fsanitize=fuzzer -I/src/fuzz-headers/lang/c -I./include -I./os/unix -I./srclib/apr/include -I./srclib/apr-util/include/ /src/fuzz_request.c -o /out/fuzz_request
+#./modules.o buildmark.o -Wl,--start-group ./server/.libs/libmain.a ./modules/core/.libs/libmod_so.a ./modules/http/.libs/libmod_http.a ./server/mpm/event/.libs/libevent.a
+# ./os/unix/.libs/libos.a ./srclib/apr/.libs/libapr-2.a -Wl,--end-group -luuid -lcrypt -lexpat -l:libbsd.a /src/pcre2/.libs/libpcre2-8.a
+#
+#
+#/src/httpd/server/.libs/libmain.a /src/httpd/modules/core/.libs/libmod_so.a /src/httpd/modules/http/.libs/libmod_http.a /src/httpd/server/mpm/event/.libs/libevent.a
+# /src/httpd/os/unix/.libs/libos.a

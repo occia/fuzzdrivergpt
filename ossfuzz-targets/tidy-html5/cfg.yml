@@ -1,0 +1,13 @@
+tidy-html5:
+  language: "c"
+  image: "fuzzdrivergpt/tidy-html5:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "tidy.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libtidy.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /work/tidy-html5/libtidy.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ['/src/tidy_config_fuzzer.c', '/src/tidy_general_fuzzer.c', '/src/tidy_parse_string_fuzzer.c', '/src/tidy_fuzzer.c', '/src/tidy_parse_file_fuzzer.c', '/src/tidy_xml_fuzzer.c']
+
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 tidy_general_fuzzer.o -o /out/tidy_general_fuzzer -fsanitize=fuzzer /work/tidy-html5/libtidy.a

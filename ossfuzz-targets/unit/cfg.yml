@@ -1,0 +1,17 @@
+unit:
+  language: "c"
+  image: "fuzzdrivergpt/unit:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "nxt_main.h"\n#include "nxt_conf.h"\n'
+  headers: { 
+    "/src/unit/src" : "**/*.h",
+    "/src/unit/build" : "*.h" 
+  }
+  binaries: [ "/src/unit/build/libnxt.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/src/unit/src","-I/src/unit/build" ]
+  build: "COMPBASE OUTFILE -L/src/unit/build -lnxt -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/unit/fuzzer/Fuzz_http.c","/src/unit/fuzzer/Fuzz_json.c" ]
+
+#clang  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -I ../src -I ../build -I../src/test/ -Wall -Werror -g -c Fuzz_http.c
+#  clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -L../build/ -o Fuzz_http Fuzz_http.o  -fsanitize=fuzzer -lnxt

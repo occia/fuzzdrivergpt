@@ -1,0 +1,17 @@
+lighttpd:
+  language: "c"
+  image: "fuzzdrivergpt/lighttpd:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: {
+    "/src/lighttpd1.4" : "*.h",
+    "/src/lighttpd1.4" : "**/*.h"
+  }
+  binaries: [ "/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_access.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_redirect.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_accesslog.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_rewrite.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_ajp13.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_rrdtool.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_alias.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_scgi.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_auth.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_setenv.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_authn_file.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_simple_vhost.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_cgi.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_sockproxy.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_deflate.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_ssi.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_dirlisting.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_staticfile.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_evhost.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_status.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_expire.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_userdir.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_extforward.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_vhostdb.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_fastcgi.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_webdav.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_indexfile.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_wstunnel.a","/src/lighttpd1.4/fuzzdrivergpt-install/lib/mod_proxy.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/src/lighttpd1.4/src" ]
+  build: "COMPBASE OUTFILE  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ["/src/fuzz_burl.c"]
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -c /src/fuzz_burl.c -I. -I../include
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsani·tize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer fuzz_burl.o lighttpd-burl.o lighttpd-buffer.o lighttpd-base64.o lighttpd-ck.o -o /out/fuzz_burl

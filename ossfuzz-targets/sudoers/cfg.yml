@@ -1,0 +1,20 @@
+sudoers:
+  language: "c"
+  image: "fuzzdrivergpt/sudoers:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include <stdbool.h>\n'
+  headers: { 
+    "/src/sudo/include" : "*.h",
+    "/src/sudo/plugins" : "**/*.h"
+  }
+  binaries: [ "/src/sudo/lib/iolog/.libs/libsudo_iolog.a","/src/sudo/lib/logsrv/.libs/liblogsrv.a","/src/sudo/lib/fuzzstub/.libs/libsudo_fuzzstub.a","/src/sudo/lib/util/.libs/libsudo_util.a", "/src/sudo/lib/eventlog/.libs/libsudo_eventlog.a","/src/sudo/lib/protobuf-c/.libs/libprotobuf-c.a","/src/sudo/plugins/sample/.libs/sample_plugin.a","/src/sudo/plugins/audit_json/.libs/audit_json.a","/src/sudo/plugins/sudoers/.libs/sudoers.a","/src/sudo/plugins/sudoers/.libs/libparsesudoers.a","/src/sudo/plugins/sample_approval/.libs/sample_approval.a","/src/sudo/plugins/system_group/.libs/system_group.a","/src/sudo/plugins/group_file/.libs/group_file.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/root/workspace/fuzzdrivergpt/install/include", "-I/src/sudo/include","-I/src/sudo/plugins" ,"-D_PATH_SUDO_CONF='/etc/sudo.conf'","-DZLIB_CONST","-D_FORTIFY_SOURCE=2","-DDEFAULT_TEXT_DOMAIN='sudo'","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fvisibility=hidden","-Wall","-Wmissing-prototypes","-Wno-unknown-pragmas","-Wpointer-arith","-Wshadow","-Wsign-compare","-Wwrite-strings","-Wvla","-Walloca","-Wimplicit-fallthrough","-Werror","-fPIE","-fstack-protector-strong","-fcf-protection",]
+  build: "COMPBASE OUTFILE /src/sudo/lib/iolog/.libs/libsudo_iolog.a /src/sudo/lib/logsrv/.libs/liblogsrv.a /src/sudo/lib/fuzzstub/.libs/libsudo_fuzzstub.a /src/sudo/lib/util/.libs/libsudo_util.a /src/sudo/lib/eventlog/.libs/libsudo_eventlog.a /src/sudo/lib/protobuf-c/.libs/libprotobuf-c.a /src/sudo/plugins/sample/.libs/sample_plugin.a /src/sudo/plugins/audit_json/.libs/audit_json.a /src/sudo/plugins/sudoers/.libs/sudoers.a /src/sudo/plugins/sudoers/.libs/libparsesudoers.a /src/sudo/plugins/sample_approval/.libs/sample_approval.a /src/sudo/plugins/system_group/.libs/system_group.a /src/sudo/plugins/group_file/.libs/group_file.a -Wl,--allow-multiple-definition -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fPIE -pie -fstack-protector-strong -fcf-protection -Wl,-z -Wl,relro -Wl,-z -Wl,now -Wl,-z -Wl,noexecstack -O1 -Wl,--enable-new-dtags -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/sudo/plugins/sudoers/regress/fuzz/fuzz_policy.c","/src/sudo/logsrvd/regress/fuzz/fuzz_logsrvd_conf.c","/src/sudo/lib/iolog/regress/fuzz/fuzz_iolog_json.c","/src/sudo/plugins/sudoers/regress/fuzz/fuzz_sudoers_ldif.c","/src/sudo/plugins/sudoers/regress/fuzz/fuzz_sudoers.c","/src/sudo/lib/iolog/regress/fuzz/fuzz_iolog_legacy.c","/src/sudo/lib/util/regress/fuzz/fuzz_sudo_conf.c","/src/sudo/lib/iolog/regress/fuzz/fuzz_iolog_timing.c" ]
+
+
+# clang -c -o fuzz_sudo_conf.lo -I../../include -I../.. -I. -I. -D_PATH_SUDO_CONF=\'/etc/sudo.conf\' -DZLIB_CONST -D_FORTIFY_SOURCE=2 -DDEFAULT_TEXT_DOMAIN=\'sudo\' -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fvisibility=hidden -Wall -Wmissing-prototypes -Wno-unknown-pragmas -Wpointer-arith -Wshadow -Wsign-compare -Wwrite-strings -Wvla -Walloca -Wimplicit-fallthrough -Werror -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fPIE -fstack-protector-strong -fcf-protection ./regress/fuzz/fuzz_sudo_conf.c
+#
+#
+#  clang -o fuzz_sudo_conf fuzz_sudo_conf.o -Wl,--allow-multiple-definition -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fPIE -pie -fstack-protector-strong -fcf-protection -Wl,-z -Wl,relro -Wl,-z -Wl,now -Wl,-z -Wl,noexecstack -O1 -Wl,--enable-new-dtags -fsanitize=fuzzer ./.libs/libparsesudoers.a  ./.libs/libsudo_util.a -lcrypto -lpthread

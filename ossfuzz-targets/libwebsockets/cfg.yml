@@ -1,0 +1,14 @@
+libwebsockets:
+  language: "c"
+  image: "fuzzdrivergpt/libwebsockets:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "lws_config.h"\n#include "libwebsockets.h"\n'
+  autoinclude: false
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/libwebsockets.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-O1", "-fno-omit-frame-pointer", "-gline-tables-only", "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION", "-fsanitize=address", "-fsanitize-address-use-after-scope", "-fsanitize=fuzzer-no-link", "-fsanitize=fuzzer", "-I/root/workspace/fuzzdrivergpt/install/include" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libwebsockets.a -L/usr/lib/x86_64-linux-gnu/ -l:libssl.so -l:libcrypto.so -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libwebsockets/lws_upng_inflate_fuzzer.cpp" ]
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer -I/src/libwebsockets//build/include -o /out/lws_upng_inflate_fuzzer lws_upng_inflate_fuzzer.cpp -L/src/libwebsockets//build/lib -l:libwebsockets.a -L/usr/lib/x86_64-linux-gnu/ -l:libssl.so -l:libcrypto.so

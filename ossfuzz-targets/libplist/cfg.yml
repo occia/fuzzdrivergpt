@@ -1,0 +1,13 @@
+libplist:
+  language: "c"
+  image: "fuzzdrivergpt/libplist:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libplist-2.0.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /src/libplist/src/.libs/libplist-2.0.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ['/src/libplist/fuzz/bplist_fuzzer.cc', '/src/libplist/fuzz/oplist_fuzzer.cc/src/libplist/fuzz/xplist_fuzzer.cc', '/src/libplist/fuzz/jplist_fuzzer.cc']
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 -Iinclude/ fuzz/bplist_fuzzer.cc -o /out/bplist_fuzzer -fsanitize=fuzzer src/.libs/libplist-2.0.a

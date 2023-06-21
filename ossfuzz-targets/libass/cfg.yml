@@ -1,0 +1,14 @@
+libass:
+  language: "c"
+  image: "fuzzdrivergpt/libass:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libass.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION" ]
+  build: "COMPBASE OUTFILE /usr/lib/libFuzzingEngine.a /usr/lib/x86_64-linux-gnu/libfreetype.a /src/libass/libass/.libs/libass.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libass/fuzz/fuzz.c" ]
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -stdlib=libc++ -std=c++11 -o fuzz
+#/fuzz_ossfuzz fuzz/fuzz-fuzz.o /usr/lib/libFuzzingEngine.a libass/.libs/libass.a -Wl,-Bstatic -Wl,-Bdynamic -fsanitize=address

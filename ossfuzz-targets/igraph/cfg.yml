@@ -1,0 +1,17 @@
+igraph:
+  language: "c"
+  image: "fuzzdrivergpt/igraph:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "igraph/igraph.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libigraph.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ,"-I/root/workspace/fuzzdrivergpt/install/include","-I/src/deps/include/libxml2","-DLIBXML_STATIC"]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libigraph.a -L/src/deps/lib -lxml2 -lm -ldl -o OUTEXE"
+  compile_cpp: [ "clang++", "-fsanitize=address", "-fsanitize=fuzzer", "-O1", "-fno-omit-frame-pointer", "-gline-tables-only", "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION", "-fsanitize=address", "-fsanitize-address-use-after-scope", "-fsanitize=fuzzer-no-link", "-I/root/workspace/fuzzdrivergpt/install/include", "-I/src/deps/include/libxml2", "-DLIBXML_STATIC", "-Wno-unused-variable", "-Wno-newline-eof", "-Wno-unused-but-set-variable", "-Wno-implicit-function-declaration", "-stdlib=libc++", "-Wno-deprecated" ]
+  build_cpp: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libigraph.a -L/src/deps/lib -lxml2 -lm -ldl -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ["/src/igraph/fuzzing/bliss_fuzzer.cpp","/src/igraph/fuzzing/read_graphml_fuzzer.cpp","/src/igraph/fuzzing/edge_connectivity_fuzzer.cpp","/src/igraph/fuzzing/read_lgl_fuzzer.cpp","/src/igraph/fuzzing/read_dl_fuzzer.cpp","/src/igraph/fuzzing/read_ncol_fuzzer.cpp","/src/igraph/fuzzing/read_edgelist_fuzzer.cpp","/src/igraph/fuzzing/read_pajek_fuzzer.cpp","/src/igraph/fuzzing/read_gml_fuzzer.cpp","/src/igraph/fuzzing/vertex_connectivity_fuzzer.cpp","/src/igraph/fuzzing/read_graphdb_fuzzer.cpp","/src/igraph/fuzzing/vertex_separators_fuzzer.cpp" ]
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -I/src/igraph/build/include -I/src/igraph/include -o read_edgelist_fuzzer.o -c ./fuzzing/read_edgelist_fuzzer.cpp
+#
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer read_edgelist_fuzzer.o -o /out/read_edgelist_fuzzer ./build/src/libigraph.a -I/src/deps/include/libxml2 -DLIBXML_STATIC -L/src/deps/lib -lxml2 -lm -ldl

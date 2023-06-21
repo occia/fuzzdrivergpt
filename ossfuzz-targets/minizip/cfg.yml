@@ -1,0 +1,14 @@
+minizip:
+  language: "c"
+  image: "fuzzdrivergpt/minizip:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "mz.h"\n#include "mz_crypt.h"\n#include "mz_strm.h"\n#include "mz_strm_mem.h"\n#include "mz_strm_pkcrypt.h"\n#include "mz_strm_wzaes.h"\n#include "mz_zip.h"\n#include "mz_zip_rw.h"\n#include "zip.h"\n#include "mz_compat.h"\n#include "mz_os.h"\n#include "mz_strm_buf.h"\n#include "mz_strm_os.h"\n#include "mz_strm_split.h"\n#include "unzip.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libminizip.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DHAVE_INTTYPES_H","-DHAVE_STDINT_H","-D_POSIX_C_SOURCE=200112L","-I/src/minizip-ng","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION" ]
+  build: "COMPBASE OUTFILE /src/minizip-ng/libminizip.a /usr/lib/libFuzzingEngine.a -lssl -lcrypto -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/minizip-ng/test/fuzz/unzip_fuzzer.c","/src/minizip-ng/test/fuzz/zip_fuzzer.c" ]
+
+#/usr/local/bin/clang -DHAVE_INTTYPES_H -DHAVE_STDINT_H -D_POSIX_C_SOURCE=200112L -I/src/minizip-ng -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -MD -MT CMakeFiles/zip_fuzzer.dir/test/fuzz/zip_fuzzer.c.o -MF CMakeFiles/zip_fuzzer.dir/test/fuzz/zip_fuzzer.c.o.d -o CMakeFiles/zip_fuzzer.dir/test/fuzz/zip_fuzzer.c.o -c /src/minizip-ng/test/fuzz/zip_fuzzer.c
+#/usr/local/bin/clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -stdlib=libc++ CMakeFiles/zip_fuzzer.dir/test/fuzz/zip_fuzzer.c.o -o zip_fuzzer  libminizip.a /usr/lib/libFuzzingEngine.a -lssl -lcrypto

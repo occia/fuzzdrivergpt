@@ -1,0 +1,17 @@
+coturn:
+  language: "c"
+  image: "fuzzdrivergpt/coturn:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include <fcntl.h>\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libturn_server.a" , "/root/workspace/fuzzdrivergpt/install/lib/libturnclient.a" , "/root/workspace/fuzzdrivergpt/install/lib/libturncommon.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-DTURN_NO_HIREDIS", "-I/root/workspace/fuzzdrivergpt/install/include", "-I/root/workspace/fuzzdrivergpt/install/include/turn/server", "-I/root/workspace/fuzzdrivergpt/install/include/turn/client", "-I/root/workspace/fuzzdrivergpt/install/include/turn", "-O1", "-fno-omit-frame-pointer", "-gline-tables-only", "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION", "-fsanitize=address", "-fsanitize-address-use-after-scope", "-fsanitize=fuzzer-no-link", "-fsanitize=fuzzer", "-std=gnu11", "-fuse-ld=lld" ]
+  build: "COMPBASE OUTFILE -o OUTEXE /root/workspace/fuzzdrivergpt/install/lib/libturnclient.a /root/workspace/fuzzdrivergpt/install/lib/libturn_server.a /root/workspace/fuzzdrivergpt/install/lib/libturncommon.a /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /root/workspace/fuzzdrivergpt/install/lib/libevent_core.so /root/workspace/fuzzdrivergpt/install/lib/libevent_extra.so /root/workspace/fuzzdrivergpt/install/lib/libevent_openssl.so /root/workspace/fuzzdrivergpt/install/lib/libevent_pthreads.so /root/workspace/fuzzdrivergpt/install/lib/libevent.so"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/coturn/fuzzing/FuzzStun.c", "/src/coturn/fuzzing/FuzzStunClient.c", ]
+
+#/usr/lib/libFuzzingEngine.a 
+#/usr/local/bin/clang -DTURN_NO_HIREDIS -I/src/coturn/my_build/fuzzing -I/src/coturn/fuzzing -I/src/coturn/src/apps/common -I/src/coturn/src/server -I/src/coturn/src -I/src/coturn/src/client -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -std=gnu11 -MD -MT fuzzing/CMakeFiles/FuzzStun.dir/FuzzStun.c.o -MF CMakeFiles/FuzzStun.dir/FuzzStun.c.o.d -o CMakeFiles/FuzzStun.dir/FuzzStun.c.o -c /src/coturn/fuzzing/FuzzStun.c
+#
+#
+#/usr/local/bin/clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Wl,-rpath,'$ORIGIN/lib' CMakeFiles/FuzzStun.dir/FuzzStun.c.o -o FuzzStun  -Wl,-rpath,/out/lib ../lib/libturnclient.a /usr/lib/libFuzzingEngine.a ../lib/libturncommon.a /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /out/lib/libevent_core.so /out/lib/libevent_extra.so /out/lib/libevent_openssl.so /out/lib/libevent_pthreads.so

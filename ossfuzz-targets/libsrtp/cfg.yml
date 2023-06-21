@@ -1,0 +1,18 @@
+libsrtp:
+  language: "c"
+  image: "fuzzdrivergpt/libsrtp:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "srtp2/crypto_types.h"\n#include "srtp2/auth.h"\n#include "srtp2/cipher.h"\n#include "srtp2/srtp.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libsrtp2.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DHAVE_CONFIG_H","-I/src/libsrtp/crypto/include","-g","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-fPIC","-Wno-language-extension-token" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libsrtp2.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libsrtp/fuzzer/fuzzer.c" ]
+
+
+
+#clang -DHAVE_CONFIG_H -Iinclude -I./include -I../include -I../crypto/include/ -g -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fPIC -Wno-language-extension-token -g fuzzer.c -c -o fuzzer.o
+#clang++ -DHAVE_CONFIG_H -Iinclude -I./include -I../include -I../crypto/include/ -g -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -g -c -std=c++11 mt19937.cpp -o mt19937.o
+#clang -DHAVE_CONFIG_H -Iinclude -I./include -I../include -I../crypto/include/ -g -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fPIC -Wno-language-extension-token -g -O0 testmem.c -c -o testmem.o
+#clang++ -DHAVE_CONFIG_H -Iinclude -I./include -I../include -I../crypto/include/ -g -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -g -L. -L.. fuzzer.o mt19937.o testmem.o -fsanitize=fuzzer -lsrtp2  -o srtp-fuzzer

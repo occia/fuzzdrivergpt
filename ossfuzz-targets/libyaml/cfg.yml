@@ -1,0 +1,16 @@
+libyaml:
+  language: "c"
+  image: "fuzzdrivergpt/libyaml:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/src/libyaml/include" : "**/*" }
+  binaries: [ "/src/libyaml/src/.libs/libyaml.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ,"-I/src","-I/src/libyaml/include"]
+  build: "COMPBASE OUTFILE /src/libyaml/src/.libs/libyaml.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ['/src/libyaml/libyaml_deconstructor_alt_fuzzer.c', '/src/libyaml/libyaml_emitter_fuzzer.c', '/src/libyaml/libyaml_reformatter_alt_fuzzer.c', '/src/libyaml/libyaml_deconstructor_fuzzer.c', '/src/libyaml/libyaml_loader_fuzzer.c', '/src/libyaml/libyaml_reformatter_fuzzer.c', '/src/libyaml/libyaml_dumper_fuzzer.c', '/src/libyaml/libyaml_parser_fuzzer.c', '/src/libyaml/libyaml_scanner_fuzzer.c']
+
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -I /src -Iinclude -c /src/libyaml_scanner_fuzzer.c -o libyaml_scanner_fuzzer.o
+
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 libyaml_scanner_fuzzer.o -o /out/libyaml_scanner_fuzzer -fsanitize=fuzzer src/.libs/libyaml.a

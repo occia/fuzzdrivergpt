@@ -1,0 +1,16 @@
+lz4:
+  language: "c"
+  image: "fuzzdrivergpt/lz4:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/liblz4.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-g","-DLZ4_DEBUG=1","-DXXH_NAMESPACE=LZ4_","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION" ]
+  build: "COMPBASE OUTFILE /src/lz4/lib/liblz4.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/lz4/ossfuzz/compress_frame_fuzzer.c","/src/lz4/ossfuzz/compress_fuzzer.c","/src/lz4/ossfuzz/compress_hc_fuzzer.c","/src/lz4/ossfuzz/decompress_frame_fuzzer.c","/src/lz4/ossfuzz/decompress_fuzzer.c","/src/lz4/ossfuzz/round_trip_frame_fuzzer.c","/src/lz4/ossfuzz/round_trip_frame_uncompressed_fuzzer.c","/src/lz4/ossfuzz/round_trip_fuzzer.c","/src/lz4/ossfuzz/round_trip_hc_fuzzer.c","/src/lz4/ossfuzz/round_trip_stream_fuzzer.c" ]
+
+
+#clang -c -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -g -DLZ4_DEBUG=1    -DXXH_NAMESPACE=LZ4_ -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION round_trip_frame_uncompressed_fuzzer.c -o round_trip_frame_uncompressed_fuzzer.o -I../lib
+#
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -g -DLZ4_DEBUG=1   -I../lib -DXXH_NAMESPACE=LZ4_ -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION  -fsanitize=fuzzer round_trip_frame_uncompressed_fuzzer.o lz4_helpers.o fuzz_data_producer.o ../lib/liblz4.a -o round_trip_frame_uncompressed_fuzzer

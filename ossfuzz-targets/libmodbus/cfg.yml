@@ -1,0 +1,11 @@
+libmodbus:
+  language: "c"
+  image: "fuzzdrivergpt/libmodbus:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libmodbus.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-O1", "-Wall", "-Wextra", "-gline-tables-only", "-fno-omit-frame-pointer", "-fsanitize=address", "-fsanitize=fuzzer-no-link", "-fsanitize-address-use-after-scope", "-fsanitize=fuzzer", "-I/root/workspace/fuzzdrivergpt/install/include", "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION", "-fuse-ld=lld" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libmodbus.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libmodbus/fuzz/FuzzClient.c", "/src/libmodbus/fuzz/FuzzServer.c" ]

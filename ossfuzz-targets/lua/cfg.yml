@@ -1,0 +1,15 @@
+lua:
+  language: "c"
+  image: "fuzzdrivergpt/lua:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "lapi.h"\n#include "lauxlib.h"\n#include "lcode.h"\n#include "lctype.h"\n#include "ldebug.h"\n#include "ldo.h"\n#include "lfunc.h"\n#include "lgc.h"\n#include "llex.h"\n#include "llimits.h"\n#include "lmem.h"\n#include "lobject.h"\n#include "lopcodes.h"\n#include "lopnames.h"\n#include "lparser.h"\n#include "lprefix.h"\n#include "lstate.h"\n#include "lstring.h"\n#include "ltable.h"\n#include "ltests.h"\n#include "ltm.h"\n#include "lua.h"\n#include "luaconf.h"\n#include "lualib.h"\n#include "lundump.h"\n#include "lvm.h"\n#include "lzio.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/liblua.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope", "-fsanitize=fuzzer-no-link", "-fuse-ld=lld" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/liblua.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fuzz_lua.c" ]
+
+# clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -c fuzz_lua.c -o fuzz_lua.o
+#
+#  + clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer fuzz_lua.o -o /out/fuzz_lua ./liblua.a

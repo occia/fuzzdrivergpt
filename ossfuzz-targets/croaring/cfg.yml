@@ -1,0 +1,15 @@
+croaring:
+  language: "c"
+  image: "fuzzdrivergpt/croaring:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include <stdarg.h>\n#include <stddef.h>\n#include <setjmp.h>\n#include <assert.h>\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libroaring.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/root/workspace/fuzzdrivergpt/install/include", "-fuse-ld=lld" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libroaring.a /root/workspace/fuzzdrivergpt/install/lib/libcmocka.so -o OUTEXE"
+  run: "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/root/workspace/fuzzdrivergpt/install/lib OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/croaring_fuzzer.c" ]
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -I/src/croaring/include -c /src/croaring_fuzzer.c -o fuzzer.o
+#
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer fuzzer.o -o /out/croaring_fuzzer /src/croaring/build-dir/src/libroaring.a

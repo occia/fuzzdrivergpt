@@ -1,0 +1,17 @@
+picotls:
+  language: "c"
+  image: "fuzzdrivergpt/picotls:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "picotls.h"\n#include "picotls/asn1.h"\n#include "picotls/ffx.h"\n#include "picotls/minicrypto.h"\n#include "picotls/pembase64.h"\n#include "picotls/certificate_compression.h"\n#include "picotls/fusion.h"\n#include "picotls/openssl.h"\n#include "picotls/ptlsbcrypt.h"\n'
+
+  headers: { "/src/picotls/include" : "**/*" }
+  binaries: [ "/src/picotls/libpicotls-minicrypto.a", "/src/picotls/libpicotls-core.a", "/src/picotls/libpicotls-openssl.a","/src/picotls/libpicotls-core.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DPTLS_FUZZ_HANDSHAKE=1","-I/src/picotls/deps/cifra/src/ext","-I/src/picotls/deps/cifra/src","-I/src/picotls/deps/micro-ecc","-I/src/picotls/deps/picotest","-I/src/picotls/include","-I/src/picotls","-I/src/picotls/t","-D_GNU_SOURCE","-pthread","-std=c99","-Wall","-O2","-g","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-D_GNU_SOURCE" ]
+  build: "COMPBASE OUTFILE  /src/picotls/libpicotls-minicrypto.a /src/picotls/libpicotls-core.a /src/picotls/libpicotls-openssl.a -lcrypto -lFuzzingEngine /src/picotls/libpicotls-core.a -ldl -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/picotls/fuzz/fuzz-asn1.c","/src/picotls/fuzz/fuzz-client-hello.c","/src/picotls/fuzz/fuzz-server-hello.c" ]
+
+
+#/usr/local/bin/clang -DPTLS_FUZZ_HANDSHAKE=1 -I/src/picotls/deps/cifra/src/ext -I/src/picotls/deps/cifra/src -I/src/picotls/deps/micro-ecc -I/src/picotls/deps/picotest -I/src/picotls/include -I/src/picotls -I/src/picotls/t -D_GNU_SOURCE -pthread -std=c99 -Wall -O2 -g  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -D_GNU_SOURCE -MD -MT CMakeFiles/fuzz-asn1.dir/fuzz/fuzz-asn1.c.o -MF CMakeFiles/fuzz-asn1.dir/fuzz/fuzz-asn1.c.o.d -o CMakeFiles/fuzz-asn1.dir/fuzz/fuzz-asn1.c.o -c /src/picotls/fuzz/fuzz-asn1.c[ 96%] Linking CXX executable fuzz-asn1
+#/usr/local/bin/cmake -E cmake_link_script CMakeFiles/fuzz-asn1.dir/link.txt --verbose=1
+#/usr/local/bin/clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -stdlib=libc++ -rdynamic "CMakeFiles/fuzz-asn1.dir/fuzz/fuzz-asn1.c.o" -o fuzz-asn1  libpicotls-minicrypto.a libpicotls-core.a libpicotls-openssl.a -lcrypto -lFuzzingEngine libpicotls-core.a -ldl

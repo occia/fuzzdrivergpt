@@ -1,0 +1,14 @@
+p11-kit:
+  language: "c"
+  image: "fuzzdrivergpt/p11-kit:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/p11-kit.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "XXX_FILL_COMP_OPTS_XXX" ]
+  build: "COMPBASE OUTFILE XXX_FILL_LINK_OPTS_XXX -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [
+    "/src/p11-kit/fuzz/main.c" ,
+    "/src/p11-kit/rpc_fuzzer.c" ]
+

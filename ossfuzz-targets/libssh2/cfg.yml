@@ -1,0 +1,18 @@
+libssh2:
+  language: "c"
+  image: "fuzzdrivergpt/libssh2:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "libssh2.h"\n#include "libssh2_publickey.h"\n#include "libssh2_sftp.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libssh2.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DHAVE_CONFIG_H","-DLIBSSH2DEBUG","-fsanitize=fuzzer","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /src/libssh2/src/.libs/libssh2.a -lssl -lcrypto -lz -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libssh2/tests/ossfuzz/ssh2_client_fuzzer.cc" ]
+
+
+#clang++ -DHAVE_CONFIG_H  -DLIBSSH2DEBUG  -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -MT ssh2_client_fuzzer-ssh2_client_fuzzer.o -MD -MP -MF .deps/ssh2_client_fuzzer-ssh2_client_fuzzer.Tpo -c -o ssh2_client_fuzzer-ssh2_client_fuzzer.o `test -f 'ssh2_client_fuzzer.cc' || echo './'`ssh2_client_fuzzer.cc
+#mv -f .deps/ssh2_client_fuzzer-ssh2_client_fuzzer.Tpo .deps/ssh2_client_fuzzer-ssh2_client_fuzzer.Po
+#/bin/bash ../../libtool  --tag=CXX   --mode=link clang++  -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++  -static  -o ssh2_client_fuzzer ssh2_client_fuzzer-ssh2_client_fuzzer.o ../../src/libssh2.la
+#libtool: link: clang++ -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -o ssh2_client_fuzzer ssh2_client_fuzzer-ssh2_client_fuzzer.o  ../../src/.libs/libssh2.a -lssl -lcrypto -lz
+#'tests/ossfuzz/ssh2_client_fuzzer' -> '/out/ssh2_client_fuzzer'

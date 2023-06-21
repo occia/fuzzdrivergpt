@@ -1,0 +1,14 @@
+ruby:
+  language: "c"
+  image: "fuzzdrivergpt/ruby:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/usr/local/include/ruby-3.3.0+0" : "**/*.h" }
+  binaries: [ "/src/ruby/libruby-static.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ,"-I/usr/local/include/ruby-3.3.0+0/x86_64-linux","-I/usr/local/include/ruby-3.3.0+0"]
+  build: "COMPBASE OUTFILE -L/usr/local/lib  -Wl,-rpath,/usr/local/lib -L/usr/local/lib -lruby -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fuzz_ruby_gems.c" ]
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link fuzz_ruby_gems.c -o /out/fuzz_ruby_gems -Wall '-Wl,-rpath,$ORIGIN/lib' -L/usr/local/lib -I/usr/local/include/ruby-3.3.0+0/x86_64-linux -I/usr/local/include/ruby-3.3.0+0 -Wl,-rpath,/usr/local/lib -L/usr/local/lib -lruby -fsanitize=fuzzer
+

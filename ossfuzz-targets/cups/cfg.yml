@@ -1,0 +1,17 @@
+cups:
+  language: "c"
+  image: "fuzzdrivergpt/cups:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib64/libcups.a",
+  "/root/workspace/fuzzdrivergpt/install/lib64/libcupsimage.a"]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-Wall","-Werror","-D_CUPS_SOURCE","-D_FORTIFY_SOURCE=2","-D_REENTRANT","-D_LARGEFILE_SOURCE","-D_LARGEFILE64_SOURCE","-D_THREAD_SAFE","-D_REENTRANT","-I/root/workspace/fuzzdrivergpt/install/include" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib64/libcups.a /root/workspace/fuzzdrivergpt/install/lib64/libcupsimage.a  -lssl -lcrypto -lz -lpthread -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/cups/fuzzer/FuzzCUPS.c", "/src/cups/fuzzer/FuzzIPP.c", "/src/cups/fuzzer/FuzzRaster.c", ]
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -Wall -Werror -D_CUPS_SOURCE -D_FORTIFY_SOURCE=2 -D_REENTRANT -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -I./../ -I./../cups/ -c FuzzCUPS.c
+#  clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -Wall -Werror -D_CUPS_SOURCE -D_FORTIFY_SOURCE=2 -D_REENTRANT -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -I./../ -I./../cups/ -c FuzzIPP.c
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -Wall -Werror -D_CUPS_SOURCE -D_FORTIFY_SOURCE=2 -D_REENTRANT -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -I./../ -I./../cups/ -c FuzzRaster.c
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -o FuzzCUPS FuzzCUPS.o -L./../cups/ /usr/lib/libFuzzingEngine.a -lcups -lcupsimage -lssl -lcrypto -lz -lpthread

@@ -1,0 +1,26 @@
+postfix:
+  language: "c"
+  image: "fuzzdrivergpt/postfix:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: {
+    "/src/postfix/postfix/src/global" : "*.h",
+    "/src/postfix/postfix/include" : "*.h"
+  }
+  binaries: [
+    "/root/workspace/fuzzdrivergpt/install/lib/libglobal.a",
+    "/root/workspace/fuzzdrivergpt/install/lib/libutil.a",
+    "/root/workspace/fuzzdrivergpt/install/lib/libdns.a",
+    "/root/workspace/fuzzdrivergpt/install/lib/libmaster.a",
+    "/root/workspace/fuzzdrivergpt/install/lib/libmilter.a",
+    "/root/workspace/fuzzdrivergpt/install/lib/libtls.a",
+    "/root/workspace/fuzzdrivergpt/install/lib/libxsasl.a"
+    ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-DHAS_DEV_URANDOM","-DSNAPSHOT","-UUSE_DYNAMIC_LIBS","-DDEF_SHLIB_DIR='no'","-UUSE_DYNAMIC_MAPS","-I/src/postfix/postfix/src/global","-I/src/postfix/postfix/include" ]
+  build: "COMPBASE OUTFILE -o OUTEXE /root/workspace/fuzzdrivergpt/install/lib/libglobal.a /root/workspace/fuzzdrivergpt/install/lib/libutil.a /root/workspace/fuzzdrivergpt/install/lib/libdns.a  /root/workspace/fuzzdrivergpt/install/lib/libmaster.a /root/workspace/fuzzdrivergpt/install/lib/libmilter.a /root/workspace/fuzzdrivergpt/install/lib/libtls.a /root/workspace/fuzzdrivergpt/install/lib/libxsasl.a -ldb -lnsl"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fuzz_mime.c","/src/fuzz_tok822.c"]
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -DHAS_DEV_URANDOM -DSNAPSHOT -UUSE_DYNAMIC_LIBS -DDEF_SHLIB_DIR='no' -UUSE_DYNAMIC_MAPS -I. -I../../include -DNO_EAI -DDEF_SMTPUTF8_ENABLE='no' -g -O -DLINUX4 -Wformat -Wno-comment -fno-common -c /src/fuzz_tok822.c
+#
+# clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer ./src/global/fuzz_mime.o -o /out/fuzz_mime ./lib/libglobal.a ./lib/libutil.a -ldb -lnsl

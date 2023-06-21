@@ -1,0 +1,15 @@
+avahi:
+  language: "c"
+  image: "fuzzdrivergpt/avahi:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include <assert.h>\n#include <sys/socket.h>\n#include "avahi-common/address.h"\n#include "avahi-common/error.h"\n#include "avahi-common/simple-watch.h"\n#include "avahi-core/core.h"\n#include "avahi-core/publish.h"\n#include "avahi-common/alternative.h"\n#include "avahi-common/gccmacro.h"\n#include "avahi-common/strlst.h"\n#include "avahi-core/dns.h"\n#include "avahi-core/rr.h"\n#include "avahi-common/cdecl.h"\n#include "avahi-common/llist.h"\n#include "avahi-common/thread-watch.h"\n#include "avahi-core/hashmap.h"\n#include "avahi-common/defs.h"\n#include "avahi-common/malloc.h"\n#include "avahi-common/timeval.h"\n#include "avahi-core/log.h"\n#include "avahi-common/domain.h"\n#include "avahi-common/rlist.h"\n#include "avahi-common/watch.h"\n#include "avahi-core/lookup.h"\n#include "client.h"\n'
+  headers: { "/work/include" : "**/*" }
+  binaries: [ "/work/lib/libavahi-common.a","/work/lib/libavahi-core.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/work/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-D_REENTRANT ","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/src/avahi/avahi-client" ]
+  build: "COMPBASE OUTFILE   /work/lib/libavahi-core.a /work/lib/libavahi-common.a  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/avahi_packet_consume_record_fuzzer.cc","/src/avahi_packet_consume_key_fuzzer.cc" ]
+
+
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 -I/work/include/ /src/avahi_packet_consume_record_fuzzer.cc -o /out/avahi_packet_consume_record_fuzzer -fsanitize=fuzzer /work/lib/libavahi-core.a /work/lib/libavahi-common.a
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 -I/work/include/ /src/avahi_packet_consume_key_fuzzer.cc -o /out/avahi_packet_consume_key_fuzzer -fsanitize=fuzzer /work/lib/libavahi-core.a /work/lib/libavahi-common.a

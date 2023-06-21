@@ -1,0 +1,14 @@
+janus-gateway:
+  language: "c"
+  image: "fuzzdrivergpt/janus-gateway:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/src/ins/lib/janus/events/libjanus_gelfevh.a","/src/ins/lib/janus/plugins/libjanus_echotest.a","/src/ins/lib/janus/plugins/libjanus_nosip.a","/src/ins/lib/janus/plugins/libjanus_recordplay.a","/src/ins/lib/janus/plugins/libjanus_streaming.a","/src/ins/lib/janus/plugins/libjanus_textroom.a","/src/ins/lib/janus/plugins/libjanus_videocall.a","/src/ins/lib/janus/plugins/libjanus_videoroom.a","/src/ins/lib/janus/transports/libjanus_pfunix.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-c","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/usr/include/glib-2.0","-I/usr/lib/x86_64-linux-gnu/glib-2.0/include","-I/src/janus-gateway/src","-Wl,-Bdynamic","-Wl,-Bstatic" ]
+  build: "COMPBASE OUTFILE /work/janus-lib.a -lglib-2.0 -ljansson -pthread -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/janus-gateway/fuzzers/rtp_fuzzer.c","" ]
+
+#++ clang -c -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include  -I/src/janus-gateway/src /src/janus-gateway/fuzzers/rtp_fuzzer.c -o /work/rtp_fuzzer.o
+#  ++ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ /work/rtp_fuzzer.o -o /out/rtp_fuzzer -fsanitize=fuzzer /work/janus-lib.a  -lglib-2.0 -ljansson -pthread -Wl,-Bdynamic -Wl,-Bstatic

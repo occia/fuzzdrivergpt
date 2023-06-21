@@ -1,0 +1,13 @@
+openexr:
+  language: "c"
+  image: "fuzzdrivergpt/openexr:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "OpenEXR/openexr.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/src/openexr/fuzzdrivergpt-install/lib/libIex.a","/src/openexr/fuzzdrivergpt-install/lib/libIlmThread.a","/src/openexr/fuzzdrivergpt-install/lib/libImath-3_2.a","/src/openexr/fuzzdrivergpt-install/lib/libOpenEXR.a","/src/openexr/fuzzdrivergpt-install/lib/libOpenEXRCore.a","/src/openexr/fuzzdrivergpt-install/lib/libOpenEXRUtil.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/src","-I/src/openexr/src/lib/OpenEXRCore","-I/src/openexr/src/lib/OpenEXR","-I/src/openexr/src/lib/OpenEXRUtil","-I/work/cmake","-fsanitize=fuzzer" ]
+  build: "COMPBASE OUTFILE /work/src/lib/OpenEXRUtil/libOpenEXRUtil.a /work/src/lib/OpenEXR/libOpenEXR.a /work/src/lib/OpenEXRCore/libOpenEXRCore.a /work/src/lib/IlmThread/libIlmThread.a /work/src/lib/Iex/libIex.a /work/_deps/imath-build/src/Imath/libImath-3_2.a -lz -lpthread -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/openexr/src/test/OpenEXRFuzzTest/oss-fuzz/openexr_exrcorecheck_fuzzer.cc","/src/openexr/src/test/OpenEXRFuzzTest/oss-fuzz/openexr_exrcheck_fuzzer.cc" ]
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link  -pthread -I/src -I /src/openexr/src/lib/OpenEXRCore -I/src/openexr/src/lib/OpenEXR -I/src/openexr/src/lib/OpenEXRUtil -I/work/cmake -fsanitize=fuzzer /work/src/lib/OpenEXRUtil/libOpenEXRUtil.a /work/src/lib/OpenEXR/libOpenEXR.a /work/src/lib/OpenEXRCore/libOpenEXRCore.a /work/src/lib/IlmThread/libIlmThread.a /work/src/lib/Iex/libIex.a /work/_deps/imath-build/src/Imath/libImath-3_2.a -lz -o /out/openexr_exrcorecheck_fuzzer /src/openexr/src/test/OpenEXRFuzzTest/oss-fuzz/openexr_exrcorecheck_fuzzer.cc

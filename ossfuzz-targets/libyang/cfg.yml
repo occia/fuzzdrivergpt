@@ -1,0 +1,17 @@
+libyang:
+  language: "c"
+  image: "fuzzdrivergpt/libyang:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "libyang/config.h"\n#include "libyang/context.h"\n#include "libyang/dict.h"\n#include "libyang/in.h"\n#include "libyang/libyang.h"\n#include "libyang/log.h"\n#include "libyang/metadata.h"\n#include "libyang/out.h"\n#include "libyang/parser_data.h"\n#include "libyang/parser_schema.h"\n#include "libyang/plugins.h"\n#include "libyang/plugins_exts.h"\n#include "libyang/plugins_types.h"\n#include "libyang/printer_data.h"\n#include "libyang/printer_schema.h"\n#include "libyang/set.h"\n#include "libyang/tree.h"\n#include "libyang/tree_data.h"\n#include "libyang/tree_edit.h"\n#include "libyang/tree_schema.h"\n#include "libyang/version.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libyang.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-O1", "-fno-omit-frame-pointer", "-gline-tables-only", "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION", "-fsanitize=address", "-fsanitize-address-use-after-scope", "-fsanitize=fuzzer-no-link", "-fsanitize=fuzzer", "-I/root/workspace/fuzzdrivergpt/install/include" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libyang.a /src/pcre2/.libs/libpcre2-8.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libyang/tests/fuzz/lyd_parse_mem_json.c", "/src/libyang/tests/fuzz/lyd_parse_mem_xml.c", "/src/libyang/tests/fuzz/lys_parse_mem.c" ]
+
+
+#for fuzzer in lyd_parse_mem_json lyd_parse_mem_xml lys_parse_mem; do
+#    $CC $CFLAGS $LIB_FUZZING_ENGINE ../tests/fuzz/${fuzzer}.c -o $OUT/${fuzzer} \
+#        ./libyang.a -I../src -I../src/plugins_exts -I./src -I./compat ${static_pcre}
+#done

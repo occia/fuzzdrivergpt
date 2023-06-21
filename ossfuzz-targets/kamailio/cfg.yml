@@ -1,0 +1,18 @@
+kamailio:
+  language: "c"
+  image: "fuzzdrivergpt/kamailio:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "hf.h"\n#include "keys.h"\n#include "msg_parser.h"\n#include "parse_addr_spec.h"\n#include "parse_allow.h"\n#include "parse_body.h"\n#include "parse_content.h"\n#include "parse_cseq.h"\n#include "parse_date.h"\n#include "parse_def.h"\n#include "parse_disposition.h"\n#include "parse_diversion.h"\n#include "parse_event.h"\n#include "parse_expires.h"\n#include "parse_fline.h"\n#include "parse_from.h"\n#include "parse_hname2.h"\n#include "parse_identity.h"\n#include "parse_identityinfo.h"\n#include "parse_methods.h"\n#include "parse_nameaddr.h"\n#include "parse_option_tags.h"\n#include "parse_param.h"\n#include "parse_ppi_pai.h"\n#include "parse_privacy.h"\n#include "parse_refer_to.h"\n#include "parse_require.h"\n#include "parse_retry_after.h"\n#include "parse_rpid.h"\n#include "parse_rr.h"\n#include "parse_sipifmatch.h"\n#include "parse_subscription_state.h"\n#include "parse_supported.h"\n#include "parse_to.h"\n#include "parse_uri.h"\n#include "parse_via.h"\n#include "parser_f.h"\n'
+  headers: { "/src/kamailio/src/core/parser" : "*.h" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libkamilio.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link", "-DFAST_LOCK","-D__CPU_i386","-I/src/kamailio/src/core/parser"]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libkamilio.a -ldl -lresolv -lm -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [
+    "/src/kamailio/misc/fuzz/fuzz_parse_msg.c",
+    "/src/kamailio/misc/fuzz/fuzz_uri.c"
+  ]
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer ./misc/fuzz/fuzz_uri.c -o /out/fuzz_uri -DFAST_LOCK -D__CPU_i386 ./src/libkamilio.a -I./src/ -I./src/core/parser -ldl -lresolv -lm
+#
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer ./misc/fuzz/fuzz_parse_msg.c -o /out/fuzz_parse_msg -DFAST_LOCK -D__CPU_i386 ./src/libkamilio.a -I./src/ -I./src/core/parser -ldl -lresolv -lm

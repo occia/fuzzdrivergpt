@@ -1,0 +1,15 @@
+utf8proc:
+  language: "c"
+  image: "fuzzdrivergpt/utf8proc:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "utf8proc.h"\n'
+  autoinclude: false
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*.h" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libutf8proc.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DUTF8PROC_STATIC","-I/src/utf8proc","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libutf8proc.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/utf8proc/test/fuzzer.c" ]
+
+#/usr/local/bin/clang -DUTF8PROC_STATIC -I/src/utf8proc/. -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -MD -MT CMakeFiles/fuzzer.dir/test/fuzzer.c.o -MF CMakeFiles/fuzzer.dir/test/fuzzer.c.o.d -o CMakeFiles/fuzzer.dir/test/fuzzer.c.o -c /src/utf8proc/test/fuzzer.c
+#/usr/local/bin/clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -rdynamic CMakeFiles/fuzzer.dir/test/fuzzer.c.o -o fuzzer  -fsanitize=fuzzer libutf8proc.a

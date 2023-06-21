@@ -1,0 +1,17 @@
+gdk-pixbuf:
+  language: "c"
+  image: "fuzzdrivergpt/gdk-pixbuf:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libgdk_pixbuf-2.0.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-pthread","-I/work/prefix/include","-I/work/prefix/include/gdk-pixbuf-2.0","-I/work/prefix/include","-I/work/prefix/include/glib-2.0","-I/work/prefix/lib/glib-2.0/include" ]
+  build: "COMPBASE OUTFILE -Wl,-Bdynamic -ldl -lm -lc -pthread -lrt -lpthread -Wl,-static -L/work/prefix/lib -Wl,--export-dynamic -lgdk_pixbuf-2.0 -lm -lpng16 -ljpeg -lgio-2.0 -pthread -lresolv -lgobject-2.0 -pthread -lffi -lgmodule-2.0 -pthread -lglib-2.0 -pthread -lz -fsanitize=fuzzer -Wl,-Bdynamic -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fuzz/animation_fuzzer.c", "/src/fuzz/pixbuf_cons_fuzzer.c", "/src/fuzz/pixbuf_file_fuzzer.c", "/src/fuzz/pixbuf_scale_fuzzer.c", "/src/fuzz/stream_fuzzer.c", ]
+
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -pthread -I/work/prefix/include -I/work/prefix/include/gdk-pixbuf-2.0 -I/work/prefix/include -I/work/prefix/include/glib-2.0 -I/work/prefix/lib/glib-2.0/include -c /src/fuzz/pixbuf_cons_fuzzer.c -o /work/pixbuf_cons_fuzzer.o
+
+
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ /work/stream_fuzzer.o -o /out/stream_fuzzer -Wl,-Bdynamic-ldl -lm -lc -pthread -lrt -lpthread -Wl,-static -L/work/prefix/lib -Wl,--export-dynamic -lgdk_pixbuf-2.0 -lm -lpng16 -ljpeg -lgio-2.0 -pthread -lresolv -lgobject-2.0 -pthread -lffi -lgmodule-2.0 -pthread -lglib-2.0 -pthread -lz -fsanitize=fuzzer -Wl,-Bdynamic

@@ -1,0 +1,16 @@
+casync:
+  language: "c"
+  image: "fuzzdrivergpt/casync:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/src/casync/src" : "**/*" }
+  binaries: [ "/work/build/src/libshared.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/src/casync/src", "-L/usr/lib/clang/15.0.0/lib/linux","-Wl,--as-needed","-Wl,--allow-shlib-undefined","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link"  ]
+  build: "COMPBASE OUTFILE /work/build/src/libshared.a -lacl /usr/lib/x86_64-linux-gnu/liblzma.so /lib/x86_64-linux-gnu/libselinux.so /usr/lib/x86_64-linux-gnu/libz.so -lm /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -pthread -lFuzzingEngine  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/casync/test/fuzz/fuzz-compress.c" ]
+
+#
+#[1/2] clang++  -o fuzz-compress fuzz-compress.p/test_fuzz_fuzz-compress.c.o -L/usr/lib/clang/15.0.0/lib/linux -Wl,--as-needed -Wl,--allow-shlib-undefined -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link  -Wl,--start-group /work/build/src/libshared.a -lacl /usr/lib/x86_64-linux-gnu/liblzma.so /lib/x86_64-linux-gnu/libselinux.so /usr/lib/x86_64-linux-gnu/libz.so -lm /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -pthread -lFuzzingEngine -Wl,--end-group
+#
+#[1/2] env MESON_SOURCE_ROOT=/src/casync MESON_BUILD_ROOT=/work/build MESON_SUBDIR= 'MESONINTROSPECT=/usr/local/bin/meson introspect' /usr/bin/true           + ninja -C /work/build install

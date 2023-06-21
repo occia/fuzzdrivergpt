@@ -1,0 +1,14 @@
+njs:
+  language: "c"
+  image: "fuzzdrivergpt/njs:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "njs.h"\n#include "njs_types.h"\n#include "njs_value.h"\n#include "njs_arr.h"\n#include "njs_rbtree.h"\n#include "njs_lvlhsh.h"\n#include "njs_queue.h"\n#include "njs_lexer.h"\n#include "njs_trace.h"\n#include "njs_regex.h"\n#include "njs_random.h"\n#include "njs_vm.h"\n#include "njs_variable.h"\n#include "njs_vmcode.h"\n#include "njs_parser.h"\n#include "njs_string.h"\n#include "njs_mp.h"\n#include "njs_utils.h"\n#include "njs_promise.h"\n#include "njs_object.h"\n#include "njs_buffer.h"\n#include "njs_regexp_pattern.h"\n#include "njs_iterator.h"\n#include "njs_generator.h"\n#include "njs_chb.h"\n#include "njs_unicode.h"\n#include "njs_symbol.h"\n#include "njs_str.h"\n#include "njs_sha2.h"\n#include "njs_sha1.h"\n#include "njs_md5.h"\n#include "njs_function.h"\n#include "njs_event.h"\n#include "njs_async.h"\n#include "njs_array.h"\n'
+  headers: { "/src/njs/src" : "**/*","/src/njs/build":"*" }
+  binaries: [ "/src/njs/build/libnjs.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ,"-I/usr/local/include","-L/usr/local/lib","-I/src/njs/src","-I/src/njs/build","-Wl,-Bstatic","-Wl,-Bdynamic"]
+  build: "COMPBASE OUTFILE /src/njs/build/libnjs.a  -lm  -lpcre2-8 -lcrypto -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/njs/build/njs_process_script_fuzzer" ]
+
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -o build/njs_process_script_fuzzer  -I/usr/local/include -Isrc -Ibuild -Injs   -fsanitize=fuzzer  build/njs_process_script_fuzzer.o   build/libnjs.a  -lm   -L/usr/local/lib -Wl,-Bstatic -lpcre2-8 -Wl,-Bdynamic -lcrypto

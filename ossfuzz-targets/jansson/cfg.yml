@@ -1,0 +1,21 @@
+jansson:
+  language: "c"
+  image: "fuzzdrivergpt/jansson:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libjansson.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DHAVE_CONFIG_H","-fsanitize=fuzzer","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /src/jansson/src/.libs/libjansson.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/jansson/test/ossfuzz/json_load_dump_fuzzer.cc" ]
+
+
+#clang++ -DHAVE_CONFIG_H    -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -MT json_load_dump_fuzzer-json_load_dump_fuzzer.o -MD -MP -MF .deps/json_load_dump_fuzzer-json_load_dump_fuzzer.Tpo -c -o json_load_dump_fuzzer-json_load_dump_fuzzer.o `test -f 'json_load_dump_fuzzer.cc' || echo './'`json_load_dump_fuzzer.cc          -I. -I../..  -I../../src -I../../src
+#clang++ -DHAVE_CONFIG_H -I. -I../..  -I../../src -I../../src   -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -MT libstandaloneengine_a-standaloneengine.o -MD -MP -MF .deps/libstandaloneengine_a-standaloneengine.Tpo -c -o libstandaloneengine_a-standaloneengine.o `test -f 'standaloneengine.cc' || echo './'`standaloneengine.cc
+#mv -f .deps/libstandaloneengine_a-standaloneengine.Tpo .deps/libstandaloneengine_a-standaloneengine.Po
+#rm -f libstandaloneengine.a
+#ar cru libstandaloneengine.a libstandaloneengine_a-standaloneengine.o
+#/bin/bash ../../libtool  --tag=CXX   --mode=link clang++  -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++  -static  -o json_load_dump_fuzzer json_load_dump_fuzzer-json_load_dump_fuzzer.o ../../src/libjansson.la
+#
+#libtool: link: clang++ -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -o json_load_dump_fuzzer json_load_dump_fuzzer-json_load_dump_fuzzer.o  ../../src/.libs/libjansson.a

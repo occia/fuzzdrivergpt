@@ -1,0 +1,17 @@
+libsndfile:
+  language: "c"
+  image: "fuzzdrivergpt/libsndfile:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "sndfile.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libsndfile.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-DHAVE_CONFIG_H", "-fsanitize=fuzzer", "-O1", "-fno-omit-frame-pointer", "-gline-tables-only", "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION", "-fsanitize=address", "-fsanitize-address-use-after-scope", "-fsanitize=fuzzer-no-link", "-Wall", "-Wextra", "-Wpointer-arith", "-Wcast-align", "-Wcast-qual", "-Wshadow", "-Wwrite-strings", "-Wundef", "-Wuninitialized", "-Winit-self", "-Wctor-dtor-privacy", "-Wnon-virtual-dtor", "-Woverloaded-virtual", "-Wreorder", "-Wsign-promo", "-I/root/workspace/fuzzdrivergpt/install/include" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libsndfile.a -lm -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libsndfile/ossfuzz/sndfile_alt_fuzzer.cc", "/src/libsndfile/ossfuzz/sndfile_fuzzer.cc" ]
+
+#clang++ -DHAVE_CONFIG_H -I. -I./src  -I./src -I./include -I./include    -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -Wall -Wextra -Wpointer-arith -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo -MT ossfuzz/sndfile_fuzzer-sndfile_fuzzer.o -MD -MP -MF ossfuzz/.deps/sndfile_fuzzer-sndfile_fuzzer.Tpo -c -o ossfuzz/sndfile_fuzzer-sndfile_fuzzer.o `test -f 'ossfuzz/sndfile_fuzzer.cc' || echo './'`ossfuzz/sndfile_fuzzer.cc
+#
+#/bin/bash ./libtool  --tag=CXX   --mode=link clang++  -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -Wall -Wextra -Wpointer-arith -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo  -static  -o ossfuzz/sndfile_fuzzer ossfuzz/sndfile_fuzzer-sndfile_fuzzer.o src/libsndfile.la
+#
+#libtool: link: clang++ -fsanitize=fuzzer -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -Wall -Wextra -Wpointer-arith -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -W$eorder -Wsign-promo -o ossfuzz/sndfile_fuzzer ossfuzz/sndfile_fuzzer-sndfile_fuzzer.o  src/.libs/libsndfile.a -lm

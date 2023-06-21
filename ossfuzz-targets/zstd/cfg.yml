@@ -1,0 +1,15 @@
+zstd:
+  language: "c"
+  image: "fuzzdrivergpt/zstd:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libzstd.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-Wall","-Wextra","-Wcast-qual","-Wcast-align","-Wshadow","-Wstrict-aliasing=1","-Wswitch-enum","-Wdeclaration-after-statement","-Wstrict-prototypes","-Wundef","-Wpointer-arith","-Wvla","-Wformat=2","-Winit-self","-Wfloat-equal","-Wwrite-strings","-Wredundant-decls","-Wmissing-prototypes","-Wc++-compat","-Qunused-arguments","-Wa,--noexecstack","-DXXH_NAMESPACE=ZSTD_","-DDEBUGLEVEL=2","-DZSTD_LEGACY_SUPPORT=1","-z","noexecstack" ]
+  build: "COMPBASE OUTFILE /usr/lib/libFuzzingEngine.a /src/zstd/fuzzdrivergpt-install/lib/libzstd.a   -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "block_decompress.c","block_round_trip.c","decompress_dstSize_tooSmall.c","dictionary_decompress.c","dictionary_loader.c","dictionary_round_trip.c","dictionary_stream_round_trip.c","fse_read_ncount.c","fuzz_data_producer.c","fuzz_helpers.c","huf_decompress.c","huf_round_trip.c","raw_dictionary_round_trip.c","regression_driver.c","seekable_roundtrip.c","sequence_compression_api.c","simple_compress.c","simple_decompress.c","simple_round_trip.c","stream_decompress.c","stream_round_trip.c","zstd_frame_info.c","zstd_helpers.c" ]
+
+#-DDEBUGLEVEL=1 -DMEM_FORCE_MEMORY_ACCESS=0 -DFUZZ_RNG_SEED_SIZE=4     -fno-omit-frame-pointer -gline-tables-only     -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -stdlib=libc++ /usr/lib/libFuzzingEngine.a simple_compress
+#
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -Wall -Wextra -Wcast-qual -Wcast-align -Wshadow -Wstrict-aliasing=1 -Wswitch-enum -Wdeclaration-after-statement -Wstrict-prototypes -Wundef -Wpointer-arith -Wvla -Wformat=2 -Winit-self -Wfloat-equal -Wwrite-strings -Wredundant-decls -Wmissing-prototypes -Wc++-compat  -Qunused-arguments -Wa,--noexecstack  -DXXH_NAMESPACE=ZSTD_ -DDEBUGLEVEL=2 -DZSTD_LEGACY_SUPPORT=1   -z noexecstack  fuzz_data_producer.c   -o fuzz_data_producer

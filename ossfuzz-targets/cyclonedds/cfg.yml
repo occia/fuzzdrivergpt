@@ -1,0 +1,23 @@
+cyclonedds:
+  language: "c"
+  image: "fuzzdrivergpt/cyclonedds:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libddsc.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-O2","-g","-DNDEBUG","-Wall","-Wextra","-Wconversion","-Wunused","-Wmissing-prototypes","-Winfinite-recursion","-Wassign-enum","-Wcomma","-Wdocumentation","-Wstrict-prototypes","-Wconditional-uninitialized","-Wshadow","-std=gnu99","-I/root/workspace/fuzzdrivergpt/install/include" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libddsc.a  -lpthread -ldl -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/cyclonedds/fuzz/fuzz_config_init/fuzz_config_init.c", "/src/cyclonedds/fuzz/fuzz_handle_rtps_message/fuzz_handle_rtps_message.c", ]
+
+
+#/usr/local/bin/clang  -I/src/cyclonedds/fuzz/fuzz_config_init/../../src/core/ddsc/src -I/src/cyclonedds/fuzz/fuzz_config_init/../../src/core/cdr/include -I/src/cyclonedds/fuzz/fuzz_config_init/..
+#/../src/core/ddsi/include -I/src/cyclonedds/fuzz/fuzz_config_init/../../src/core/ddsi/src -I/src/cyclonedds/build/src/core -I/src/cyclonedds/build/src/core/include -I/src/cyclonedds/src/core/ddsc/include -I/src/cyclonedds/src/ddsrt/include -I/sr
+#c/cyclonedds/src/ddsrt/src -I/src/cyclonedds/build/src/ddsrt/include -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -O2 -g -DNDEBUG -Wall -Wextra -Wconversion -Wunused -Wmissing-prototypes -Winfinite-re
+#cursion -Wassign-enum -Wcomma -Wdocumentation -Wstrict-prototypes -Wconditional-uninitialized -Wshadow -std=gnu99 -MD -MT fuzz/fuzz_config_init/CMakeFiles/fuzz_config_init.dir/fuzz_config_init.c.o -MF CMakeFiles/fuzz_config_init.dir/fuzz_config_
+#init.c.o.d -o CMakeFiles/fuzz_config_init.dir/fuzz_config_init.c.o -c /src/cyclonedds/fuzz/fuzz_config_init/fuzz_config_init.c
+
+
+
+#/usr/local/bin/clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -O2 -g -DNDEBUG -undefined error CMakeFiles/fuzz_config_init.dir/fuzz_config_init.c.o -o ../../bin/fuzz_config_init  ../../lib/libddsc
+#.a /usr/lib/libFuzzingEngine.a -lpthread -ldl

@@ -1,0 +1,16 @@
+miniz:
+  language: "c"
+  image: "fuzzdrivergpt/miniz:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libminiz.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-Wshadow","-Wformat=2","-Wall","-Wno-overlength-strings","-pedantic","-O3","-DNDEBUG","-std=gnu90","-MD" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libminiz.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/miniz/tests/checksum_fuzzer.c","/src/miniz/tests/flush_fuzzer.c","/src/miniz/tests/small_fuzzer.c","/src/miniz/tests/uncompress_fuzzer.c","/src/miniz/tests/compress_fuzzer.c","/src/miniz/tests/large_fuzzer.c","/src/miniz/tests/uncompress2_fuzzer.c","/src/miniz/tests/zip_fuzzer.c" ]
+
+#/usr/local/bin/clang  -I/src/miniz/build/amalgamation -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Wshadow -Wformat=2 -Wall -Wno-overlength-strings -pedantic -O3 -DNDEBUG -std=gnu90 -MD -MT CMakeFiles/zip_fuzzer.dir/tests/zip_fuzzer.c.o -MF CMakeFiles/zip_fuzzer.dir/tests/zip_fuzzer.c.o.d -o CMakeFiles/zip_fuzzer.dir/tests/zip_fuzzer.c.o -c /src/miniz/tests/zip_fuzzer.c
+#
+#
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Wshadow -Wformat=2 -Wall -Wno-overlength-strings -pedantic -O3 -DNDEBUG -rdynamic CMakeFiles/zip_fuzzer.dir/tests/fuzz_main.c.o CMakeFiles/zip_fuzzer.dir/tests/zip_fuzzer.c.o -o /src/miniz/bin/zip_fuzzer  libminiz.a

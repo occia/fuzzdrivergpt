@@ -1,0 +1,26 @@
+ostree:
+  language: "c"
+  image: "fuzzdrivergpt/ostree:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include <fcntl.h>\n#include <stdbool.h>\n#include "ostree.h"\n'
+  autoinclude: false
+  headers: { "/root/workspace/fuzzdrivergpt/install/include/ostree-1" : "*.h" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libostree-1.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-DHAVE_CONFIG_H","-DDATADIR='/usr/local/share'","-DLIBEXECDIR='/usr/local/libexec'","-DLOCALEDIR='/usr/local/share/locale'","-DSYSCONFDIR='/usr/local/etc'","-DTARGET_PREFIX='/usr/local'","-DOSTREE_COMPILATION","-DG_LOG_DOMAIN='\"OSTree\"'","-DOSTREE_GITREV='v2022.2-41-gf21944da1cf24cc2bbf1d4dfbd3aaa698d4f0a70'","-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_66","-DSOUP_VERSION_MIN_REQUIRED=SOUP_VERSION_2_40","-I/src/ostree/src/libotutil","-I/src/ostree/libglnx","-I/usr/include/gio-unix-2.0","-I/usr/include/glib-2.0","-I/usr/lib/x86_64-linux-gnu/glib-2.0/include","-DPKGLIBEXECDIR='/usr/local/libexec/libostree'", "-I/root/workspace/fuzzdrivergpt/install/include/ostree-1"  ]
+  build: "COMPBASE OUTFILE -o OUTEXE /src/ostree/.libs/libbsdiff.a /src/ostree/.libs/libglnx.a /src/ostree/.libs/libotutil.a -L/usr/lib/x86_64-linux-gnu /src/ostree/.libs/libostree-1.a /src/ostree/.libs/libostreetest.a  -l:libgpgme.a -l:libassuan.a /usr/lib/x86_64-linux-gnu/libgpg-error.so -l:liblzma.a -l:libgio-2.0.a -lresolv -l:libgobject-2.0.a -l:libffi.a -l:libgmodule-2.0.a -l:libglib-2.0.a -lm -l:libz.a -l:libselinux.a -pthread -l:libpcre2-8.a"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fuzz-bsdiff.c","/src/fuzz-repo.c" ]
+
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no
+#-link -DHAVE_CONFIG_H -I. -DDATADIR='/usr/local/share' -DLIBEXECDIR='/usr/local/libexec' -DLOCALEDIR='/usr/local/share/locale' -DSYSCONFDIR='/usr/local/etc' -DTARG
+#ET_PREFIX='/usr/local' -DOSTREE_COMPILATION -DG_LOG_DOMAIN='OSTree' -DOSTREE_GITREV='v2022.2-41-gf21944da1cf24cc2bbf1d4dfbd3aaa698d4f0a70' -DGLIB_VERSION_MIN_REQUIRED=
+#GLIB_VERSION_2_66 -DSOUP_VERSION_MIN_REQUIRED=SOUP_VERSION_2_40 -I./src/libotutil -I./src/libostree -I./src/libostree -I./src/ostree -I./libglnx -I/usr/include/gio-unix-2.0
+# -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -DPKGLIBEXECDIR='/usr/local/libexec/libostree' -o tests/fuzz-bsdiff.o -c tests/fuzz-bsdiff.c
+#
+#
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no
+#-link -fsanitize=fuzzer -I./src/libotutil -I./src/libostree -I./src/libostree -I./src/ostree -I./libglnx -I/usr/include/gio-unix-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_
+#64-linux-gnu/glib-2.0/include -DPKGLIBEXECDIR='/usr/local/libexec/libostree' -o /out/fuzz-bsdiff tests/fuzz-bsdiff.o ./.libs/libbsdiff.a ./.libs/libglnx.a ./.libs/libotut
+#il.a -L/usr/lib/x86_64-linux-gnu ./.libs/libostree-1.a ./.libs/libostreetest.a ./.libs/libostree-1.a -l:libgpgme.a -l:libassuan.a /usr/lib/x86_64-linux-gnu/libgpg-error.so
+#-l:liblzma.a -l:libgio-2.0.a -lresolv -l:libgobject-2.0.a -l:libffi.a -l:libgmodule-2.0.a -l:libglib-2.0.a -lm -l:libz.a -l:libselinux.a -pthread -l:libpcre2-8.a

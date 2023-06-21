@@ -1,0 +1,16 @@
+libxls:
+  language: "c"
+  image: "fuzzdrivergpt/libxls:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include <locale.h>\n#include "xls.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libxlsreader.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DHAVE_CONFIG_H","-Wall","-pedantic-errors","-std=c99","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-Wnewline-eof" ]
+  build: "COMPBASE OUTFILE /src/libxls/.libs/libxlsreader.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libxls/fuzz/fuzz_xls.c" ]
+
+#clang -DHAVE_CONFIG_H   -Wall -pedantic-errors -std=c99 -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -MT fuzz/xls-fuzz_xls.o -MD -MP -MF fuzz/.deps/xls-fuzz_xls.Tpo -c -o fuzz/xls-fuzz_xls.o `test -f 'fuzz/fuzz_xls.c' || echo './'`fuzz/fuzz_xls.c
+#mv -f fuzz/.deps/xls-fuzz_xls.Tpo fuzz/.deps/xls-fuzz_xls.Po
+#/bin/bash ./libtool  --tag=CXX   --mode=link clang++ -std=gnu++11  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -static  -o fuzz_xls fuzz/xls-fuzz_xls.o libxlsreader.la -fsanitize=fuzzer
+#libtool: link: clang++ -std=gnu++11 -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -o fuzz_xls fuzz/xls-fuzz_xls.o -fsanitize=fuzzer  ./.libs/libxlsreader.a

@@ -1,0 +1,16 @@
+readstat:
+  language: "c"
+  image: "fuzzdrivergpt/readstat:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libreadstat.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /src/readstat/.libs/libreadstat.a -lm -lz -ldl -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/readstat/src/fuzz/fuzz_compression_sas_rle.c","/src/readstat/src/fuzz/fuzz_compression_sav.c","/src/readstat/src/fuzz/fuzz_format.c","/src/readstat/src/fuzz/fuzz_format_dta.c","/src/readstat/src/fuzz/fuzz_format_por.c","/src/readstat/src/fuzz/fuzz_format_sas7bcat.c","/src/readstat/src/fuzz/fuzz_format_sas7bdat.c","/src/readstat/src/fuzz/fuzz_format_sas_commands.c","/src/readstat/src/fuzz/fuzz_format_sav.c","/src/readstat/src/fuzz/fuzz_format_spss_commands.c","/src/readstat/src/fuzz/fuzz_format_stata_dictionary.c","/src/readstat/src/fuzz/fuzz_format_xport.c","/src/readstat/src/fuzz/fuzz_grammar_dta_timestamp.c","/src/readstat/src/fuzz/fuzz_grammar_por_double.c","/src/readstat/src/fuzz/fuzz_grammar_sav_date.c","/src/readstat/src/fuzz/fuzz_grammar_sav_time.c","/src/readstat/src/fuzz/fuzz_grammar_spss_format.c","/src/readstat/src/fuzz/fuzz_grammar_xport_format.c" ]
+
+
+#/bin/bash ./libtool  --tag=CXX   --mode=link clang++  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link   -static  -o fuzz_format_xport src/fuzz/fuzz_format_xport-fuzz_format.o src/fuzz/fuzz_format_xport-fuzz_format_xport.o src/test/fuzz_format_xport-test_buffer_io.o libreadstat.la -fsanitize=fuzzer
+
+#libtool: link: clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -o fuzz_format_xport src/fuzz/fuzz_format_xport-fuzz_format.o src/fuzz/fuzz_format_xport-fuzz_format_xport.o src/test/fuzz_format_xport-test_buffer_io.o -fsanitize=fuzzer  /src/readstat/.libs/libreadstat.a -lm -lz

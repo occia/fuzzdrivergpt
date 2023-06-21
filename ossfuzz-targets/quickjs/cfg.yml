@@ -1,0 +1,16 @@
+quickjs:
+  language: "c"
+  image: "fuzzdrivergpt/quickjs:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/src/quickjs" : "*.h" }
+  binaries: [ "/src/quickjs/libquickjs.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/src/quickjs", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link", ]
+  build: "COMPBASE OUTFILE /src/quickjs/libquickjs.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fuzz_compile.c","/src/fuzz_eval.c","/src/fuzz_regexp.c" ]
+
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Iquickjs -c fuzz_regexp.c -o fuzz_regexp.o
+#  + clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ fuzz_regexp.o -o /out/fuzz_regexp quickjs/libquickjs.a -fsanitize=fuzzer
+#

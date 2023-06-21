@@ -1,0 +1,18 @@
+inchi:
+  language: "c"
+  image: "fuzzdrivergpt/inchi:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "ichi.h"\n#include "inchi_api.h"\n#include "inchi_gui.h"\n#include "inchicmp.h"\n#include "ichi_bns.h"\n#include "ichi_io.h"\n#include "ichicano.h"\n#include "ichicant.h"\n#include "ichicomn.h"\n#include "ichicomp.h"\n#include "ichidrp.h"\n#include "ichierr.h"\n#include "ichimain.h"\n#include "ichimake.h"\n#include "ichinorm.h"\n#include "ichiring.h"\n#include "ichirvrs.h"\n#include "ichisize.h"\n#include "ichister.h"\n#include "ichitaut.h"\n#include "ichitime.h"\n#include "ikey_base26.h"\n#include "extr_ct.h"\n#include "incomdef.h"\n#include "inpdef.h"\n#include "ixa.h"\n#include "mode.h"\n#include "mol_fmt.h"\n#include "readinch.h"\n#include "sha2.h"\n#include "strutil.h"\n#include "util.h"\n#include "ixa_mol.h"\n#include "ixa_status.h"\n#include "inchi_dll.h"\n#include "inchi_dll_a.h"\n#include "inchi_dll_b.h"\n#include "inchi_dll_main.h"\n'
+  headers: {
+    "/src/INCHI-1-SRC/INCHI_BASE/src" : "*.h",
+    "/src/INCHI-1-SRC/INCHI_API/libinchi/src/ixa" : "*.h",
+    "/src/INCHI-1-SRC/INCHI_API/libinchi/src" : "*.h"
+  }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libinchi.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-fsanitize-address-use-after-scope", "-I/src/INCHI-1-SRC/INCHI_BASE/src/","-I/src/INCHI-1-SRC/INCHI_API/libinchi/src/","-I/src/INCHI-1-SRC/INCHI_API/libinchi/src/ixa/", "-Wno-everything", "-DTARGET_API_LIB", "-DCOMPILE_ANSI_ONLY", "-ansi" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libinchi.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/inchi_input_fuzzer.c"]
+
+# clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -I INCHI_BASE/src/ -I INCHI_API/libinchi/src/ -I INCHI_API/libinchi/src/ixa/ /src/inchi_input_fuzzer.c -c -o inchi_input_fuzzer.o
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ inchi_input_fuzzer.o -o /out/inchi_input_fuzzer -fsanitize=fuzzer /work/libinchi.a

@@ -1,0 +1,14 @@
+libgd:
+  language: "c"
+  image: "fuzzdrivergpt/libgd:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "gd.h"\n#include "gd_color_map.h"\n#include "gd_errors.h"\n#include "gd_io.h"\n#include "gdcache.h"\n#include "gdfontg.h"\n#include "gdfontl.h"\n#include "gdfontmb.h"\n#include "gdfonts.h"\n#include "gdfontt.h"\n#include "gdfx.h"\n#include "gdpp.h"\n'
+  headers: { "/work/include" : "**/*" }
+  binaries: [ "/work/lib/libgd.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/work/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-L/work/lib","-Wl,-Bstatic","-Wl,-Bdynamic"]
+  build: "COMPBASE OUTFILE -lgd -lz -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/gd_image_string_fuzzer.cc" ]
+
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -std=c++11 -I/work/include -L/work/lib /src/gd_image_string_fuzzer.cc -o /out/gd_image_string_fuzzer -fsanitize=fuzzer -lgd -Wl,-Bstatic -lz -Wl,-Bdynamic

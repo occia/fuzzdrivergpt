@@ -1,0 +1,14 @@
+unicorn:
+  language: "c"
+  image: "fuzzdrivergpt/unicorn:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "unicorn/unicorn.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libunicorn.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libunicorn.a /src/unicorn/build/libx86_64-softmmu.a /src/unicorn/build/libaarch64-softmmu.a /src/unicorn/build/libarm-softmmu.a /src/unicorn/build/libm68k-softmmu.a /src/unicorn/build/libmips64el-softmmu.a /src/unicorn/build/libmips64-softmmu.a /src/unicorn/build/libmipsel-softmmu.a /src/unicorn/build/libmips-softmmu.a /src/unicorn/build/libppc64-softmmu.a /src/unicorn/build/libppc-softmmu.a /src/unicorn/build/libriscv32-softmmu.a /src/unicorn/build/libriscv64-softmmu.a /src/unicorn/build/libsparc64-softmmu.a /src/unicorn/build/libsparc-softmmu.a /src/unicorn/build/libs390x-softmmu.a /src/unicorn/build/libunicorn-common.a -lpthread -lrt -lm -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/unicorn/tests/fuzz/fuzz_emu_arm64_arm.c","/src/unicorn/tests/fuzz/fuzz_emu_arm64_armbe.c","/src/unicorn/tests/fuzz/fuzz_emu_arm_arm.c","/src/unicorn/tests/fuzz/fuzz_emu_arm_armbe.c","/src/unicorn/tests/fuzz/fuzz_emu_arm_thumb.c","/src/unicorn/tests/fuzz/fuzz_emu_m68k_be.c","/src/unicorn/tests/fuzz/fuzz_emu_mips_32be.c","/src/unicorn/tests/fuzz/fuzz_emu_mips_32le.c","/src/unicorn/tests/fuzz/fuzz_emu_s390x_be.c","/src/unicorn/tests/fuzz/fuzz_emu_sparc_32be.c","/src/unicorn/tests/fuzz/fuzz_emu_x86_16.c","/src/unicorn/tests/fuzz/fuzz_emu_x86_32.c","/src/unicorn/tests/fuzz/fuzz_emu_x86_64.c" ]
+
+
+# clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ CMakeFiles/fuzz_emu_arm64_armbe.dir/tests/fuzz/fuzz_emu_arm64_armbe.c.o libunicorn.a libx86_64-softmmu.a libaarch64-softmmu.a libarm-softmmu.a libm68k-softmmu.a libmips64el-softmmu.a libmips64-softmmu.a libmipsel-softmmu.a libmips-softmmu.a libppc64-softmmu.a libppc-softmmu.a libriscv32-softmmu.a libriscv64-softmmu.a libsparc64-softmmu.a libsparc-softmmu.a libs390x-softmmu.a libunicorn-common.a -lpthread -lrt -lm -o /out/fuzz_emu_arm64_armbe -fsanitize=fuzzer

@@ -1,0 +1,12 @@
+libjpeg-turbo:
+  language: "c"
+  image: "fuzzdrivergpt/libjpeg-turbo:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include <stdbool.h>\n#include "jpeglib.h"\n#include "turbojpeg.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libjpeg.a", "/root/workspace/fuzzdrivergpt/install/lib/libturbojpeg.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-O1", "-fno-omit-frame-pointer", "-gline-tables-only", "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION", "-fsanitize=address", "-fsanitize-address-use-after-scope", "-fsanitize=fuzzer-no-link", "-g", "-DNDEBUG", "-fsanitize=fuzzer", "-I/root/workspace/fuzzdrivergpt/install/include", "-fuse-ld=lld" ]
+  # not sure whether these two lib files are conflict
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libjpeg.a /root/workspace/fuzzdrivergpt/install/lib/libturbojpeg.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libjpeg-turbo.dev/fuzz/cjpeg.cc", "/src/libjpeg-turbo.dev/fuzz/cjpeg12.cc", "/src/libjpeg-turbo.dev/fuzz/cjpeg16.cc", "/src/libjpeg-turbo.dev/fuzz/compress.cc", "/src/libjpeg-turbo.dev/fuzz/compress_lossless.cc", "/src/libjpeg-turbo.dev/fuzz/compress_yuv.cc", "/src/libjpeg-turbo.dev/fuzz/decompress.cc", "/src/libjpeg-turbo.dev/fuzz/decompress_yuv.cc", "/src/libjpeg-turbo.dev/fuzz/transform.cc" ]

@@ -1,0 +1,21 @@
+libvnc:
+  language: "c"
+  image: "fuzzdrivergpt/libvnc:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "base64.h"\n#include "crypto.h"\n#include "d3des.h"\n#include "lzoconf.h"\n#include "lzodefs.h"\n#include "minilzo.h"\n#include "sha-private.h"\n#include "sha.h"\n#include "sockets.h"\n#include "turbojpeg.h"\n'
+  headers: { "/src/libvncserver/include" : "**/*",
+  "/src/libvncserver/build/include" : "**/*" ,
+  "/src/libvncserver/src/libvncclient" : "**/*" ,
+  "/src/libvncserver/src/common" : "**/*" }
+
+  binaries: [ "/src/libvncserver/build/libvncserver.a","/src/libvncserver/build/libvncclient.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DLIBVNCSERVER_HAVE_LIBZ","-DLIBVNCSERVER_WITH_WEBSOCKETS","-I/src/libvncserver/include","-I/src/libvncserver/build/include","-I/src/libvncserver/src/libvncserver","-I/src/libvncserver/src/libvncclient","-I/src/libvncserver/src/common","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE /src/libvncserver/build/libvncserver.a /src/libvncserver/build/libvncclient.a /usr/lib/x86_64-linux-gnu/libz.so /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libvncserver/test/fuzz_server.c" ]
+
+#/usr/local/bin/clang -DLIBVNCSERVER_HAVE_LIBZ -DLIBVNCSERVER_WITH_WEBSOCKETS -I/src/libvncserver/include -I/src/libvncserver/build/include -I/src/libvncserver/src/libvncserver -I/src/libvncserver/src/libvncclient -I/src/libvncserver/src/common -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsantize=fuzzer-no-link -MD -MT CMakeFiles/fuzz_server.dir/test/fuzz_server.c.o -MF CMakeFiles/fuzz_server.dir/test/fuzz_server.c.o.d -o CMakeFiles/fuzz_server.dir/test/fuzz_server.c.o -c /src/libvncserver/test/fuzz_server.c
+
+
+#
+#  /usr/local/bin/clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link CMakeFiles/fuzz_server.dir/test/fuzz_server.c.o -o fuzz_server  libvncserver.a -fsanitize=fuzzer /usr/lib/x86_64-linux-gnu/libz.so /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so

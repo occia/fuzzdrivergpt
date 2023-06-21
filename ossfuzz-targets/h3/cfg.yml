@@ -1,0 +1,17 @@
+h3:
+  language: "c"
+  image: "fuzzdrivergpt/h3:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libh3.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-DH3_PREFIX=","-DH3_USE_LIBFUZZER=1","-I/root/workspace/fuzzdrivergpt/install/include" ]
+  build: "COMPBASE OUTFILE -rdynamic /root/workspace/fuzzdrivergpt/install/lib/libh3.a  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/h3/src/apps/fuzzers/fuzzerCellArea.c", "/src/h3/src/apps/fuzzers/fuzzerCellProperties.c", "/src/h3/src/apps/fuzzers/fuzzerCellToChildPos.c", "/src/h3/src/apps/fuzzers/fuzzerCellToLatLng.c", "/src/h3/src/apps/fuzzers/fuzzerCellsToLinkedMultiPolygon.c", "/src/h3/src/apps/fuzzers/fuzzerCompact.c", "/src/h3/src/apps/fuzzers/fuzzerDirectedEdge.c", "/src/h3/src/apps/fuzzers/fuzzerDistances.c", "/src/h3/src/apps/fuzzers/fuzzerEdgeLength.c", "/src/h3/src/apps/fuzzers/fuzzerGridDisk.c", "/src/h3/src/apps/fuzzers/fuzzerHierarchy.c", "/src/h3/src/apps/fuzzers/fuzzerIndexIO.c", "/src/h3/src/apps/fuzzers/fuzzerInternalAlgos.c", "/src/h3/src/apps/fuzzers/fuzzerInternalCoordIjk.c", "/src/h3/src/apps/fuzzers/fuzzerLatLngToCell.c", "/src/h3/src/apps/fuzzers/fuzzerLocalIj.c", "/src/h3/src/apps/fuzzers/fuzzerPolygonToCells.c", "/src/h3/src/apps/fuzzers/fuzzerPolygonToCellsNoHoles.c", "/src/h3/src/apps/fuzzers/fuzzerResolutions.c", "/src/h3/src/apps/fuzzers/fuzzerVertexes.c", ]
+
+#
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -DH3_PREFIX= -DH3_USE_LIBFUZZER=1 -I/src/h3//src/apps/applib/include -I/src/h3//src/h3lib/include -I/src/h3//build/src/h3lib/include -o fuzzerResolutions.o -c /src/h3//src/apps/fuzzers/fuzzerResolutions.c
+
+#
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer -rdynamic fuzzerLatLngToCell.o -o /out/fuzzerLatLngToCell lib/libh3.a

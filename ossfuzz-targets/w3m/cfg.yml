@@ -1,0 +1,17 @@
+w3m:
+  language: "c"
+  image: "fuzzdrivergpt/w3m:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "wc.h"\n'
+  headers: { 
+    "/src/w3m/libwc" : "*.h",
+    "/src/w3m" : "*.h" 
+  }
+  binaries: [ "/src/w3m/libwc/libwc.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/src/w3m","-I/src/w3m/libwc" ,"-DHAVE_CONFIG_H"]
+  build: "COMPBASE OUTFILE /src/w3m/Str.o /src/w3m/myctype.o /src/w3m/libwc/libwc.a /usr/lib/x86_64-linux-gnu/libgc.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/w3m/fuzz/fuzz-conv.c" ]
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -c ../fuzz/fuzz-conv.c -o fuzz_conv.o -I../ -I./
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer fuzz_conv.o -o /out/fuzz_conv -I./libwc -DUSE_UNICODE -I. -I./.. -DHAVE_CONFIG_H ../Str.o ../myctype.o libwc.a /usr/lib/x86_64-linux-gnu/libgc.a

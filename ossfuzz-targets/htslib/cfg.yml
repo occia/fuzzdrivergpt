@@ -1,0 +1,15 @@
+htslib:
+  language: "c"
+  image: "fuzzdrivergpt/htslib:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libhts.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-Wall","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-fvisibility=hidden","-I/src","-I/src/htslib","-I/src/htslib/htscodecs/htscodecs"]
+  build: "COMPBASE OUTFILE  -lbz2 /src/htslib/libhts.a -lz -llzma -lcurl -lcrypto -lpthread -lm -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/htslib/test/fuzz/hts_open_fuzzer.c" ]
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -o /out/hts_open_fuzzer test/fuzz/hts_open_fuzzer.o -fsanitize=fuzzer libhts.a -lz -lbz2 -llzma -lcurl -lcrypto -lpthread
+#
+#
+#clang -Wall -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fvisibility=hidden  -I.  -c -o test/fuzz/hts_open_fuzzer.o test/fuzz/hts_open_fuzzer.c

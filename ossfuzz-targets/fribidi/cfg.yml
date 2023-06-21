@@ -1,0 +1,17 @@
+fribidi:
+  language: "c"
+  image: "fuzzdrivergpt/fribidi:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libfribidi.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-I/root/workspace/fuzzdrivergpt/install/include","-fcolor-diagnostics","-D_FILE_OFFSET_BITS=64","-Wall","-Winvalid-pch","-O0","-g","-fvisibility=hidden","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-DHAVE_CONFIG_H","'-DFRIBIDI_ENTRY=__attribute__((visibility(\"default\")))'" ]
+  build: "COMPBASE OUTFILE -Wl,--as-needed -Wl,--no-undefined -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Wl,--start-group /root/workspace/fuzzdrivergpt/install/lib/libfribidi.a -Wl,--end-group -fsanitize=fuzzer -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fribidi/bin/fribidi-fuzzer.c" ]
+
+
+#clang -Ibin/fribidi-fuzzer.p -Ibin -I../../src/fribidi/bin -I. -I../../src/fribidi -Ilib -I../../src/fribidi/lib -Igen.tab -I../../src/fribidi/gen.tab -fcolor-diagnostics -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -fvisibility=hidden -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -DHAVE_CONFIG_H '-DFRIBIDI_ENTRY=__attribute__ ((visibility ("default")))' -MD -MQ bin/fribidi-fuzzer.p/fribidi-fuzzer.c.o -MF bin/fribidi-fuzzer.p/fribidi-fuzzer.c.o.d -o bin/fribidi-fuzzer.p/fribidi-fuzzer.c.o -c ../../src/fribidi/bin/fribidi-fuzzer.c
+#
+#
+#clang  -o bin/fribidi-fuzzer bin/fribidi-fuzzer.p/fribidi-fuzzer.c.o -Wl,--as-needed -Wl,--no-undefined -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Wl,--start-group lib/libfribidi.a -Wl,--end-group -fsanitize=fuzzer

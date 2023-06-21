@@ -1,0 +1,15 @@
+libpcap:
+  language: "c"
+  image: "fuzzdrivergpt/libpcap:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "pcap-bpf.h"\n#include "pcap-namedb.h"\n#include "pcap.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libpcap.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ]
+  build: "COMPBASE OUTFILE -L/usr/lib/x86_64-linux-gnu -lssl -L/usr/lib/x86_64-linux-gnu -lcrypto /src/libpcap/build/libpcap.a  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ['/src/libpcap/testprogs/fuzz/fuzz_both.c', '/src/libpcap/testprogs/fuzz/fuzz_filter.c', '/src/libpcap/testprogs/fuzz/fuzz_pcap.c', '/src/libpcap/testprogs/fuzz/fuzz_rclient.c', '/src/libpcap/testprogs/fuzz/fuzz_rserver.c', '/src/libpcap/testprogs/fuzz/onefile.c']
+
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -I.. -c ../testprogs/fuzz/fuzz_filter.c -o fuzz_filter.o
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ fuzz_filter.o -o /out/fuzz_filter libpcap.a -fsanitize=fuzzer

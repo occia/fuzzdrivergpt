@@ -1,0 +1,8 @@
+__pycache__
+openaikey.txt
+venv
+targets
+tasks-workdir
+meta/crawled_usage.json
+tools/jdk-19.0.2
+openjdk-19.0.2_linux-x64_bin.tar.gz

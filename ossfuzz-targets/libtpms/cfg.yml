@@ -1,0 +1,16 @@
+libtpms:
+  language: "c"
+  image: "fuzzdrivergpt/libtpms:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "libtpms/tpm_error.h"\n#include "libtpms/tpm_library.h"\n#include "libtpms/tpm_memory.h"\n#include "libtpms/tpm_nvfilename.h"\n#include "libtpms/tpm_tis.h"\n#include "libtpms/tpm_types.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libtpms.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DHAVE_CONFIG_H","-I/src/libtpms/tests","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link"]
+  build: "COMPBASE OUTFILE /root/workspace/fuzzdrivergpt/install/lib/libtpms.a  -lcrypto -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/libtpms/tests/fuzz.cc" ]
+
+#clang++ -DHAVE_CONFIG_H -I. -I/src/libtpms/tests -I..     -I/src/libtpms/include  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -MT fuzz-fuzz.o -MD -MP -MF .deps/fuzz-fuzz.Tpo -c -o fuzz-fuzz.o `test -f 'fuzz.cc' || echo '/src/libtpms/tests/'`fuzz.cc
+#mv -f .deps/fuzz-fuzz.Tpo .deps/fuzz-fuzz.Po
+#/bin/bash ../libtool  --tag=CXX   --mode=link clang++  -I/src/libtpms/include  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++  -fsanitize=fuzzer -no-undefined   -o fuzz fuzz-fuzz.o  ../src/libtpms.la -lcrypto
+#libtool: link: clang++ -I/src/libtpms/include -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer -o fuzz fuzz-fuzz.o  ../src/.libs/libtpms.a -lcrypto

@@ -1,0 +1,15 @@
+librdkafka:
+  language: "c"
+  image: "fuzzdrivergpt/librdkafka:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "librdkafka/rdkafka.h"\n#include "librdkafka/rdkafka_mock.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/librdkafka.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-g","-fPIC","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link" ,"-rdynamic"]
+  build: "COMPBASE OUTFILE /src/librdkafka/src/librdkafka.a -lm /src/librdkafka/mklove/deps/dest/usr/lib/libzstd.a -lm -lcurl -lsasl2 -lssl -lcrypto -lcrypto -lz -ldl -lpthread -lrt -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ["/src/librdkafka/tests/fuzzers/fuzz_regex.c" ]
+
+#  clang -g -fPIC -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link  -o fuzz_regex.o
+#  + clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer -rdynamic fuzz_regex.o -o fuzzer ../src/librdkafka.a -lm /src/librdkafka/mklove/deps/dest/usr/lib/libzstd.a -lsasl2 -lssl -lcrypto -lcrypto -lz -ldl -lpthread -lrt  -I../src -c ./fuzzers/fuzz_regex.c
+#

@@ -1,0 +1,720 @@
+{
+  "./meta/benchmark_min_drivers/bind9_dns_master_loadbuffer.c": {
+    "api": "dns_master_loadbuffer",
+    "apinum": 12,
+    "file": "./meta/benchmark_min_drivers/bind9_dns_master_loadbuffer.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 20
+  },
+  "./meta/benchmark_min_drivers/bind9_dns_message_checksig.c": {
+    "api": "dns_message_checksig",
+    "apinum": 8,
+    "file": "./meta/benchmark_min_drivers/bind9_dns_message_checksig.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 11
+  },
+  "./meta/benchmark_min_drivers/bind9_dns_message_parse.c": {
+    "api": "dns_message_parse",
+    "apinum": 7,
+    "file": "./meta/benchmark_min_drivers/bind9_dns_message_parse.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 8
+  },
+  "./meta/benchmark_min_drivers/bind9_dns_name_fromtext.c": {
+    "api": "dns_name_fromtext",
+    "apinum": 5,
+    "file": "./meta/benchmark_min_drivers/bind9_dns_name_fromtext.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/bind9_dns_name_fromwire.c": {
+    "api": "dns_name_fromwire",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/bind9_dns_name_fromwire.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/bind9_dns_rdata_fromtext.c": {
+    "api": "dns_rdata_fromtext",
+    "apinum": 10,
+    "file": "./meta/benchmark_min_drivers/bind9_dns_rdata_fromtext.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 12
+  },
+  "./meta/benchmark_min_drivers/bind9_dns_rdata_fromwire.c": {
+    "api": "dns_rdata_fromwire",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/bind9_dns_rdata_fromwire.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/bind9_isc_lex_getmastertoken.c": {
+    "api": "isc_lex_getmastertoken",
+    "apinum": 9,
+    "file": "./meta/benchmark_min_drivers/bind9_isc_lex_getmastertoken.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 9
+  },
+  "./meta/benchmark_min_drivers/bind9_isc_lex_gettoken.c": {
+    "api": "isc_lex_gettoken",
+    "apinum": 9,
+    "file": "./meta/benchmark_min_drivers/bind9_isc_lex_gettoken.c",
+    "fn_conds": [],
+    "proj": "bind9",
+    "score": 9
+  },
+  "./meta/benchmark_min_drivers/civetweb_mg_get_response.c": {
+    "api": "mg_get_response",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/civetweb_mg_get_response.c",
+    "fn_conds": [],
+    "proj": "civetweb",
+    "score": 17
+  },
+  "./meta/benchmark_min_drivers/coturn_stun_check_message_integrity_str.c": {
+    "api": "stun_check_message_integrity_str",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/coturn_stun_check_message_integrity_str.c",
+    "fn_conds": [],
+    "proj": "coturn",
+    "score": 2
+  },
+  "./meta/benchmark_min_drivers/coturn_stun_is_binding_response.c": {
+    "api": "stun_is_binding_response",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/coturn_stun_is_binding_response.c",
+    "fn_conds": [],
+    "proj": "coturn",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/coturn_stun_is_command_message.c": {
+    "api": "stun_is_command_message",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/coturn_stun_is_command_message.c",
+    "fn_conds": [],
+    "proj": "coturn",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/coturn_stun_is_command_message_full_check_str.c": {
+    "api": "stun_is_command_message_full_check_str",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/coturn_stun_is_command_message_full_check_str.c",
+    "fn_conds": [],
+    "proj": "coturn",
+    "score": 1
+  },
+  "./meta/benchmark_min_drivers/coturn_stun_is_response.c": {
+    "api": "stun_is_response",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/coturn_stun_is_response.c",
+    "fn_conds": [],
+    "proj": "coturn",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/coturn_stun_is_success_response.c": {
+    "api": "stun_is_success_response",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/coturn_stun_is_success_response.c",
+    "fn_conds": [],
+    "proj": "coturn",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/croaring_roaring_bitmap_portable_deserialize_safe.c": {
+    "api": "roaring_bitmap_portable_deserialize_safe",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/croaring_roaring_bitmap_portable_deserialize_safe.c",
+    "fn_conds": [],
+    "proj": "croaring",
+    "score": 3
+  },
+  "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_animation_new_from_file.c": {
+    "api": "gdk_pixbuf_animation_new_from_file",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_animation_new_from_file.c",
+    "fn_conds": [],
+    "proj": "gdk-pixbuf",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_new_from_data.c": {
+    "api": "gdk_pixbuf_new_from_data",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_new_from_data.c",
+    "fn_conds": [],
+    "proj": "gdk-pixbuf",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_new_from_file.c": {
+    "api": "gdk_pixbuf_new_from_file",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_new_from_file.c",
+    "fn_conds": [],
+    "proj": "gdk-pixbuf",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_new_from_file_at_scale.c": {
+    "api": "gdk_pixbuf_new_from_file_at_scale",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_new_from_file_at_scale.c",
+    "fn_conds": [],
+    "proj": "gdk-pixbuf",
+    "score": 5
+  },
+  "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_new_from_stream.c": {
+    "api": "gdk_pixbuf_new_from_stream",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/gdk-pixbuf_gdk_pixbuf_new_from_stream.c",
+    "fn_conds": [],
+    "proj": "gdk-pixbuf",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/gpac_gf_isom_open_file.c": {
+    "api": "gf_isom_open_file",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/gpac_gf_isom_open_file.c",
+    "fn_conds": [
+      [
+        "LeakSanitizer: detected memory leaks",
+        "in gf_isom_parse_root_box /src/gpac/src/isomedia/box_funcs.c"
+      ]
+    ],
+    "proj": "gpac",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/hiredis_redisFormatCommand.c": {
+    "api": "redisFormatCommand",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/hiredis_redisFormatCommand.c",
+    "fn_conds": [
+      [
+        "in redisvFormatCommand /src/hiredis/hiredis.c"
+      ]
+    ],
+    "proj": "hiredis",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_all_minimal_st_separators.c": {
+    "api": "igraph_all_minimal_st_separators",
+    "apinum": 9,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_all_minimal_st_separators.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 12
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_automorphism_group.c": {
+    "api": "igraph_automorphism_group",
+    "apinum": 9,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_automorphism_group.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 13
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_edge_connectivity.c": {
+    "api": "igraph_edge_connectivity",
+    "apinum": 7,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_edge_connectivity.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 10
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_minimum_size_separators.c": {
+    "api": "igraph_minimum_size_separators",
+    "apinum": 9,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_minimum_size_separators.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 12
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_read_graph_dl.c": {
+    "api": "igraph_read_graph_dl",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_read_graph_dl.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_read_graph_edgelist.c": {
+    "api": "igraph_read_graph_edgelist",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_read_graph_edgelist.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_read_graph_gml.c": {
+    "api": "igraph_read_graph_gml",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_read_graph_gml.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_read_graph_graphdb.c": {
+    "api": "igraph_read_graph_graphdb",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_read_graph_graphdb.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_read_graph_graphml.c": {
+    "api": "igraph_read_graph_graphml",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_read_graph_graphml.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_read_graph_lgl.c": {
+    "api": "igraph_read_graph_lgl",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_read_graph_lgl.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_read_graph_ncol.c": {
+    "api": "igraph_read_graph_ncol",
+    "apinum": 5,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_read_graph_ncol.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 8
+  },
+  "./meta/benchmark_min_drivers/igraph_igraph_read_graph_pajek.c": {
+    "api": "igraph_read_graph_pajek",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/igraph_igraph_read_graph_pajek.c",
+    "fn_conds": [],
+    "proj": "igraph",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/inchi_GetINCHIKeyFromINCHI.c": {
+    "api": "GetINCHIKeyFromINCHI",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/inchi_GetINCHIKeyFromINCHI.c",
+    "fn_conds": [
+      [
+        "calloc parameters overflow: count * size"
+      ]
+    ],
+    "proj": "inchi",
+    "score": 5
+  },
+  "./meta/benchmark_min_drivers/inchi_GetINCHIfromINCHI.c": {
+    "api": "GetINCHIfromINCHI",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/inchi_GetINCHIfromINCHI.c",
+    "fn_conds": [
+      [
+        "calloc parameters overflow: count * size"
+      ]
+    ],
+    "proj": "inchi",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/inchi_GetStructFromINCHI.c": {
+    "api": "GetStructFromINCHI",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/inchi_GetStructFromINCHI.c",
+    "fn_conds": [
+      [
+        "calloc parameters overflow: count * size"
+      ]
+    ],
+    "proj": "inchi",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/kamailio_get_src_address_socket.c": {
+    "api": "get_src_address_socket",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_get_src_address_socket.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_get_src_uri.c": {
+    "api": "get_src_uri",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_get_src_uri.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_content_disposition.c": {
+    "api": "parse_content_disposition",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_content_disposition.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_diversion_header.c": {
+    "api": "parse_diversion_header",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_diversion_header.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_from_header.c": {
+    "api": "parse_from_header",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_from_header.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_from_uri.c": {
+    "api": "parse_from_uri",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_from_uri.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_headers.c": {
+    "api": "parse_headers",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_headers.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_identityinfo_header.c": {
+    "api": "parse_identityinfo_header",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_identityinfo_header.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_msg.c": {
+    "api": "parse_msg",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_msg.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_pai_header.c": {
+    "api": "parse_pai_header",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_pai_header.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_privacy.c": {
+    "api": "parse_privacy",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_privacy.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_record_route_headers.c": {
+    "api": "parse_record_route_headers",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_record_route_headers.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_refer_to_header.c": {
+    "api": "parse_refer_to_header",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_refer_to_header.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_route_headers.c": {
+    "api": "parse_route_headers",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_route_headers.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_to_header.c": {
+    "api": "parse_to_header",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_to_header.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_to_uri.c": {
+    "api": "parse_to_uri",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_to_uri.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/kamailio_parse_uri.c": {
+    "api": "parse_uri",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/kamailio_parse_uri.c",
+    "fn_conds": [],
+    "proj": "kamailio",
+    "score": 1
+  },
+  "./meta/benchmark_min_drivers/libbpf_bpf_object__open_mem.c": {
+    "api": "bpf_object__open_mem",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/libbpf_bpf_object__open_mem.c",
+    "fn_conds": [],
+    "proj": "libbpf",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/libdwarf_dwarf_init_b.c": {
+    "api": "dwarf_init_b",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/libdwarf_dwarf_init_b.c",
+    "fn_conds": [],
+    "proj": "libdwarf",
+    "score": 5
+  },
+  "./meta/benchmark_min_drivers/libdwarf_dwarf_init_path.c": {
+    "api": "dwarf_init_path",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/libdwarf_dwarf_init_path.c",
+    "fn_conds": [],
+    "proj": "libdwarf",
+    "score": 5
+  },
+  "./meta/benchmark_min_drivers/libiec61850_MmsValue_decodeMmsData.c": {
+    "api": "MmsValue_decodeMmsData",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/libiec61850_MmsValue_decodeMmsData.c",
+    "fn_conds": [],
+    "proj": "libiec61850",
+    "score": 2
+  },
+  "./meta/benchmark_min_drivers/liblouis_lou_compileString.c": {
+    "api": "lou_compileString",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/liblouis_lou_compileString.c",
+    "fn_conds": [],
+    "proj": "liblouis",
+    "score": 5
+  },
+  "./meta/benchmark_min_drivers/libmodbus_modbus_read_bits.c": {
+    "api": "modbus_read_bits",
+    "apinum": 5,
+    "file": "./meta/benchmark_min_drivers/libmodbus_modbus_read_bits.c",
+    "fn_conds": [],
+    "proj": "libmodbus",
+    "score": 15
+  },
+  "./meta/benchmark_min_drivers/libmodbus_modbus_read_registers.c": {
+    "api": "modbus_read_registers",
+    "apinum": 5,
+    "file": "./meta/benchmark_min_drivers/libmodbus_modbus_read_registers.c",
+    "fn_conds": [],
+    "proj": "libmodbus",
+    "score": 15
+  },
+  "./meta/benchmark_min_drivers/libmodbus_modbus_receive.c": {
+    "api": "modbus_receive",
+    "apinum": 9,
+    "file": "./meta/benchmark_min_drivers/libmodbus_modbus_receive.c",
+    "fn_conds": [],
+    "proj": "libmodbus",
+    "score": 33
+  },
+  "./meta/benchmark_min_drivers/libpg_query_pg_query_parse.c": {
+    "api": "pg_query_parse",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/libpg_query_pg_query_parse.c",
+    "fn_conds": [],
+    "proj": "libpg_query",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/libucl_ucl_parser_add_string.c": {
+    "api": "ucl_parser_add_string",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/libucl_ucl_parser_add_string.c",
+    "fn_conds": [
+      [
+        "in ucl_parse_value /src/libucl/src/ucl_parser.c"
+      ]
+    ],
+    "proj": "libucl",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/libyang_lyd_parse_data_mem.c": {
+    "api": "lyd_parse_data_mem",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/libyang_lyd_parse_data_mem.c",
+    "fn_conds": [],
+    "proj": "libyang",
+    "score": 7
+  },
+  "./meta/benchmark_min_drivers/libyang_lys_parse_mem.c": {
+    "api": "lys_parse_mem",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/libyang_lys_parse_mem.c",
+    "fn_conds": [],
+    "proj": "libyang",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/libzip_zip_fread.c": {
+    "api": "zip_fread",
+    "apinum": 6,
+    "file": "./meta/benchmark_min_drivers/libzip_zip_fread.c",
+    "fn_conds": [],
+    "proj": "libzip",
+    "score": 11
+  },
+  "./meta/benchmark_min_drivers/lua_luaL_loadbufferx.c": {
+    "api": "luaL_loadbufferx",
+    "apinum": 3,
+    "file": "./meta/benchmark_min_drivers/lua_luaL_loadbufferx.c",
+    "fn_conds": [],
+    "proj": "lua",
+    "score": 3
+  },
+  "./meta/benchmark_min_drivers/md4c_md_html.c": {
+    "api": "md_html",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/md4c_md_html.c",
+    "fn_conds": [],
+    "proj": "md4c",
+    "score": 2
+  },
+  "./meta/benchmark_min_drivers/oniguruma_onig_new.c": {
+    "api": "onig_new",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/oniguruma_onig_new.c",
+    "fn_conds": [],
+    "proj": "oniguruma",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/pjsip_pj_json_parse.c": {
+    "api": "pj_json_parse",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/pjsip_pj_json_parse.c",
+    "fn_conds": [],
+    "proj": "pjsip",
+    "score": 8
+  },
+  "./meta/benchmark_min_drivers/pjsip_pj_stun_msg_decode.c": {
+    "api": "pj_stun_msg_decode",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/pjsip_pj_stun_msg_decode.c",
+    "fn_conds": [],
+    "proj": "pjsip",
+    "score": 10
+  },
+  "./meta/benchmark_min_drivers/pjsip_pj_xml_parse.c": {
+    "api": "pj_xml_parse",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/pjsip_pj_xml_parse.c",
+    "fn_conds": [],
+    "proj": "pjsip",
+    "score": 8
+  },
+  "./meta/benchmark_min_drivers/pjsip_pjmedia_sdp_parse.c": {
+    "api": "pjmedia_sdp_parse",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/pjsip_pjmedia_sdp_parse.c",
+    "fn_conds": [],
+    "proj": "pjsip",
+    "score": 8
+  },
+  "./meta/benchmark_min_drivers/pjsip_pjsip_parse_msg.c": {
+    "api": "pjsip_parse_msg",
+    "apinum": 8,
+    "file": "./meta/benchmark_min_drivers/pjsip_pjsip_parse_msg.c",
+    "fn_conds": [],
+    "proj": "pjsip",
+    "score": 12
+  },
+  "./meta/benchmark_min_drivers/proftpd_pr_json_object_from_text.c": {
+    "api": "pr_json_object_from_text",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/proftpd_pr_json_object_from_text.c",
+    "fn_conds": [],
+    "proj": "proftpd",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/pupnp_ixmlLoadDocumentEx.c": {
+    "api": "ixmlLoadDocumentEx",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/pupnp_ixmlLoadDocumentEx.c",
+    "fn_conds": [
+      [
+        "__assert_fail",
+        "Parser_LoadDocument /src/pupnp/ixml/src/ixmlparser.c"
+      ]
+    ],
+    "proj": "pupnp",
+    "score": 4
+  },
+  "./meta/benchmark_min_drivers/quickjs_JS_Eval.c": {
+    "api": "JS_Eval",
+    "apinum": 6,
+    "file": "./meta/benchmark_min_drivers/quickjs_JS_Eval.c",
+    "fn_conds": [],
+    "proj": "quickjs",
+    "score": 9
+  },
+  "./meta/benchmark_min_drivers/quickjs_lre_compile.c": {
+    "api": "lre_compile",
+    "apinum": 5,
+    "file": "./meta/benchmark_min_drivers/quickjs_lre_compile.c",
+    "fn_conds": [],
+    "proj": "quickjs",
+    "score": 8
+  },
+  "./meta/benchmark_min_drivers/selinux_cil_compile.c": {
+    "api": "cil_compile",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/selinux_cil_compile.c",
+    "fn_conds": [],
+    "proj": "selinux",
+    "score": 5
+  },
+  "./meta/benchmark_min_drivers/selinux_policydb_read.c": {
+    "api": "policydb_read",
+    "apinum": 4,
+    "file": "./meta/benchmark_min_drivers/selinux_policydb_read.c",
+    "fn_conds": [],
+    "proj": "selinux",
+    "score": 6
+  },
+  "./meta/benchmark_min_drivers/spdk_spdk_json_parse.c": {
+    "api": "spdk_json_parse",
+    "apinum": 1,
+    "file": "./meta/benchmark_min_drivers/spdk_spdk_json_parse.c",
+    "fn_conds": [],
+    "proj": "spdk",
+    "score": 2
+  },
+  "./meta/benchmark_min_drivers/tmux_input_parse_buffer.c": {
+    "api": "input_parse_buffer",
+    "apinum": 15,
+    "file": "./meta/benchmark_min_drivers/tmux_input_parse_buffer.c",
+    "fn_conds": [],
+    "proj": "tmux",
+    "score": 42
+  },
+  "./meta/benchmark_min_drivers/w3m_wc_Str_conv_with_detect.c": {
+    "api": "wc_Str_conv_with_detect",
+    "apinum": 2,
+    "file": "./meta/benchmark_min_drivers/w3m_wc_Str_conv_with_detect.c",
+    "fn_conds": [],
+    "proj": "w3m",
+    "score": 3
+  }
+}

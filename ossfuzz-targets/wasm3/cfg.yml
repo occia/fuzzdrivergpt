@@ -1,0 +1,15 @@
+wasm3:
+  language: "c"
+  image: "fuzzdrivergpt/wasm3:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "wasm3.h"\n#include "m3_api_libc.h"\n'
+  headers: { "/src/wasm3/source" : "*.h" }
+  binaries: [ "/src/wasm3/build/source/libm3.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/src/wasm3/source", "-DM3_COMPILE_OPCODES" ]
+  build: "COMPBASE OUTFILE  /src/wasm3/build/source/libm3.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/wasm3/platforms/app_fuzz/fuzzer.c" ]
+
+#+ clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -c /src/wasm3/platforms/app_fuzz/fuzzer.c -o fuzzer.o -I/src/wasm3/source
+#
+#+ clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer -o /out/fuzzer fuzzer.o /src/wasm3/build/source/libm3.a

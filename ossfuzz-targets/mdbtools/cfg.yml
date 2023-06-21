@@ -1,0 +1,19 @@
+mdbtools:
+  language: "c"
+  image: "fuzzdrivergpt/mdbtools:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "mdbfakeglib.h"\n#include "mdbtools.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libmdb.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-DPACKAGE_NAME='mdbtools'","-DPACKAGE_TARNAME='mdbtools'","-DPACKAGE_VERSION='1.0.0'","-DPACKAGE_STRING='mdbtools\\1.0.0'","-DPACKAGE_BUGREPORT='https://github.com/mdbtools/mdbtools/issues'","-DPACKAGE_URL='https://github.com/mdbtools/mdbtools'","-DPACKAGE='mdbtools'","-DVERSION='1.0.0'","-DSTDC_HEADERS=1","-DHAVE_SYS_TYPES_H=1","-DHAVE_SYS_STAT_H=1","-DHAVE_STDLIB_H=1","-DHAVE_STRING_H=1","-DHAVE_MEMORY_H=1","-DHAVE_STRINGS_H=1","-DHAVE_INTTYPES_H=1","-DHAVE_STDINT_H=1","-DHAVE_UNISTD_H=1","-D__EXTENSIONS__=1","-D_ALL_SOURCE=1","-D_GNU_SOURCE=1","-D_POSIX_PTHREAD_SEMANTICS=1","-D_TANDEM_SOURCE=1","-DTLS=_Thread_local","-DHAVE_DLFCN_H=1","-DHAVE_FCNTL_H=1","-DHAVE_LIMITS_H=1","-DHAVE_UNISTD_H=1","-DHAVE_DECL_PROGRAM_INVOCATION_SHORT_NAME=1","-DHAVE_STRPTIME=1","-DHAVE_FMEMOPEN=1","-DHAVE_GMTIME_R=1","-DHAVE_VASPRINTF=1","-DHAVE_ATTRIBUTE_ALIAS=1","-DHAVE_ICONV=1","-DICONV_CONST=","-g","-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-Wall","-Werror" ]
+  build: "COMPBASE OUTFILE -Wl,--as-needed  /root/workspace/fuzzdrivergpt/install/lib/libmdb.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/mdbtools/src/fuzz/fuzz_mdb.c" ]
+
+
+#clang -DPACKAGE_NAME=\'mdbtools\' -DPACKAGE_TARNAME=\'mdbtools\' -DPACKAGE_VERSION=\'1.0.0\' -DPACKAGE_STRING=\'mdbtools\ 1.0.0\' -DPACKAGE_BUGREPORT=\'https://github.com/mdbtools/mdbtools/issues\' -DPACKAGE_URL=\'https://github.com/mdbtools/mdbtools\' -DPACKAGE=\'mdbtools\' -DVERSION=\'1.0.0\' -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -D__EXTENSIONS__=1 -D_ALL_SOURCE=1 -D_GNU_SOURCE=1 -D_POSIX_PTHREAD_SEMANTICS=1 -D_TANDEM_SOURCE=1 -DTLS=_Thread_local -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\'.libs/\' -DHAVE_FCNTL_H=1 -DHAVE_LIMITS_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DECL_PROGRAM_INVOCATION_SHORT_NAME=1 -DHAVE_STRPTIME=1 -DHAVE_FMEMOPEN=1 -DHAVE_GMTIME_R=1 -DHAVE_VASPRINTF=1 -DHAVE_ATTRIBUTE_ALIAS=1 -DHAVE_ICONV=1 -DICONV_CONST= -I.    -I../../include  -g -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -Wall -Werror -MT fuzz_mdb.o -MD -MP -MF .deps/fuzz_mdb.Tpo -c -o fuzz_mdb.o fuzz_mdb.c
+#
+#
+#
+#clang++  -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -static -Wl,--as-needed -o fuzz_mdb fuzz_mdb.o ../libmdb/libmdb.la -fsanitize=fuzzer
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -Wl,--as-needed -o fuzz_mdb fuzz_mdb.o -fsanitize=fuzzer  ../libmdb/.libs/libmdb.a

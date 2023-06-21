@@ -1,0 +1,14 @@
+bluez:
+  language: "c"
+  image: "fuzzdrivergpt/bluez:env"
+  apiblocklist: [ "^$" ]
+  precode: '#include "bluetooth/bluetooth.h"\n#include "bluetooth/bnep.h"\n#include "bluetooth/cmtp.h"\n#include "bluetooth/hci.h"\n#include "bluetooth/hci_lib.h"\n#include "bluetooth/hidp.h"\n#include "bluetooth/l2cap.h"\n#include "bluetooth/rfcomm.h"\n#include "bluetooth/sco.h"\n#include "bluetooth/sdp.h"\n#include "bluetooth/sdp_lib.h"\n'
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [ "/root/workspace/fuzzdrivergpt/install/lib/libbluetooth-internal.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-fsanitize=fuzzer", "-I/root/workspace/fuzzdrivergpt/install/include", "-fuse-ld=lld" ]
+  build: "COMPBASE OUTFILE /src/bluez/src/.libs/libshared-glib.a /root/workspace/fuzzdrivergpt/install/lib/libbluetooth-internal.a -l:libical.a -l:libicalss.a -l:libicalvcal.a -l:libdbus-1.a /src/glib/_build/glib/libglib-2.0.a -ldl -lpthread -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fuzz_gobex.c", "/src/fuzz_hci.c", "/src/fuzz_sdp.c", "/src/fuzz_textfile.c", "/src/fuzz_xml.c", ]
+
+
+#clang -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer -I. -I./src -I./lib -I./gobex -I/usr/local/include/glib-2.0/ -I/src/glib/_build/glib/ /src/fuzz_xml.c ./src/bluetoothd-sdp-xml.o -o /out/fuzz_xml ./src/.libs/libshared-glib.a ./lib/.libs/libbluetooth-internal.a -l:libical.a -l:libicalss.a -l:libicalvcal.a -l:libdbus-1.a /src/glib/_build/glib/libglib-2.0.a -ldl -lpthread

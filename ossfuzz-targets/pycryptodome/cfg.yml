@@ -1,0 +1,13 @@
+pycryptodome:
+  language: "c"
+  image: "fuzzdrivergpt/pycryptodome:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/src/pycryptodome/src" : "*.h" }
+  binaries: [ "/work/libpycryptodome.a" ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer","-I/root/workspace/fuzzdrivergpt/install/include", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-I/src/pycryptodome/src","-I/src/pycryptodome/src/libtom","-D","HAVE_STDINT_H","-D","HAVE_MEMALIGN","-D","HAVE_INTRIN_H","-D","SYS_BITS=64","-maes","-msse2","-mpclmul" ]
+  build: "COMPBASE OUTFILE /work/libpycryptodome.a -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: ["/src/pcd_aes_fuzzer.cc","/src/pcd_hash_fuzzer.cc"]
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -I/src/pycryptodome/src -I/src/pycryptodome/src/libtom -D HAVE_STDINT_H -D HAVE_MEMALIGN -D HAVE_INTRIN_H -D SYS_BITS=64 -maes -msse2 -mpclmul /src/pcd_hash_fuzzer.cc -D HASHTYPE=SHA256 -D FNAME=SHA256.c -D DIGEST_THIRD_PARAM -o /out/sha256_fuzzer -fsanitize=fuzzer /work/libpycryptodome.a

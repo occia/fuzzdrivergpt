@@ -1,0 +1,281 @@
+{
+  "bind9": {
+    "dns_master_load.c": [
+      "dns_master_loadbuffer"
+    ],
+    "dns_message_checksig.c": [
+      "dns_message_checksig"
+    ],
+    "dns_message_parse.c": [
+      "dns_message_parse"
+    ],
+    "dns_name_fromtext_target.c": [
+      "dns_name_fromtext"
+    ],
+    "dns_name_fromwire.c": [
+      "dns_name_fromwire"
+    ],
+    "dns_rdata_fromtext.c": [
+      "dns_rdata_fromtext"
+    ],
+    "dns_rdata_fromwire_text.c": [
+      "dns_rdata_fromtext",
+      "dns_rdata_fromwire"
+    ],
+    "isc_lex_getmastertoken.c": [
+      "isc_lex_getmastertoken"
+    ],
+    "isc_lex_gettoken.c": [
+      "isc_lex_gettoken"
+    ]
+  },
+  "civetweb": {
+    "fuzzmain.c": [
+      "mg_get_response"
+    ]
+  },
+  "coturn": {
+    "FuzzStun.c": [
+      "stun_is_command_message_full_check_str",
+      "stun_check_message_integrity_str"
+    ],
+    "FuzzStunClient.c": [
+      "stun_is_response",
+      "stun_is_binding_response",
+      "stun_is_command_message",
+      "stun_is_success_response"
+    ]
+  },
+  "croaring": {
+    "croaring_fuzzer.c": [
+      "roaring_bitmap_portable_deserialize_safe"
+    ]
+  },
+  "gdk-pixbuf": {
+    "animation_fuzzer.c": [
+      "gdk_pixbuf_animation_new_from_file"
+    ],
+    "pixbuf_cons_fuzzer.c": [
+      "gdk_pixbuf_new_from_data"
+    ],
+    "pixbuf_file_fuzzer.c": [
+      "gdk_pixbuf_new_from_file"
+    ],
+    "pixbuf_scale_fuzzer.c": [
+      "gdk_pixbuf_new_from_file_at_scale"
+    ],
+    "stream_fuzzer.c": [
+      "gdk_pixbuf_new_from_stream"
+    ]
+  },
+  "gpac": {
+    "fuzz_parse.c": [
+      "gf_isom_open_file"
+    ]
+  },
+  "hiredis": {
+    "format_command_fuzzer.c": [
+      "redisFormatCommand"
+    ]
+  },
+  "igraph": {
+    "bliss_fuzzer.cpp": [
+      "igraph_automorphism_group"
+    ],
+    "edge_connectivity_fuzzer.cpp": [
+      "igraph_edge_connectivity"
+    ],
+    "read_dl_fuzzer.cpp": [
+      "igraph_read_graph_dl"
+    ],
+    "read_edgelist_fuzzer.cpp": [
+      "igraph_read_graph_edgelist"
+    ],
+    "read_gml_fuzzer.cpp": [
+      "igraph_read_graph_gml"
+    ],
+    "read_graphdb_fuzzer.cpp": [
+      "igraph_read_graph_graphdb"
+    ],
+    "read_graphml_fuzzer.cpp": [
+      "igraph_read_graph_graphml"
+    ],
+    "read_lgl_fuzzer.cpp": [
+      "igraph_read_graph_lgl"
+    ],
+    "read_ncol_fuzzer.cpp": [
+      "igraph_read_graph_ncol"
+    ],
+    "read_pajek_fuzzer.cpp": [
+      "igraph_read_graph_pajek"
+    ],
+    "vertex_separators_fuzzer.cpp": [
+      "igraph_minimum_size_separators",
+      "igraph_all_minimal_st_separators"
+    ]
+  },
+  "inchi": {
+    "inchi_input_fuzzer.c": [
+      "GetStructFromINCHI",
+      "GetINCHIfromINCHI",
+      "GetINCHIKeyFromINCHI"
+    ]
+  },
+  "kamailio": {
+    "fuzz_parse_msg.c": [
+      "parse_from_uri",
+      "parse_to_uri",
+      "parse_route_headers",
+      "parse_record_route_headers",
+      "parse_msg",
+      "parse_content_disposition",
+      "parse_pai_header",
+      "parse_privacy",
+      "parse_identityinfo_header",
+      "parse_from_header",
+      "parse_refer_to_header",
+      "parse_diversion_header",
+      "parse_to_header",
+      "parse_headers",
+      "get_src_uri",
+      "get_src_address_socket"
+    ],
+    "fuzz_uri.c": [
+      "parse_uri"
+    ]
+  },
+  "libbpf": {
+    "bpf-object-fuzzer.c": [
+      "bpf_object__open_mem"
+    ]
+  },
+  "libdwarf": {
+    "fuzz_init_binary.c": [
+      "dwarf_init_b"
+    ],
+    "fuzz_init_path.c": [
+      "dwarf_init_path"
+    ]
+  },
+  "libiec61850": {
+    "fuzz_mms_decode.c": [
+      "MmsValue_decodeMmsData"
+    ]
+  },
+  "liblouis": {
+    "table_fuzzer.cc": [
+      "lou_compileString"
+    ]
+  },
+  "libmodbus": {
+    "FuzzClient.c": [
+      "modbus_read_bits",
+      "modbus_read_registers"
+    ],
+    "FuzzServer.c": [
+      "modbus_receive"
+    ]
+  },
+  "libpg_query": {
+    "fuzz_parser.c": [
+      "pg_query_parse"
+    ]
+  },
+  "libucl": {
+    "ucl_add_string_fuzzer.c": [
+      "ucl_parser_add_string"
+    ]
+  },
+  "libyang": {
+    "lyd_parse_mem_json.c": [
+      "lyd_parse_data_mem"
+    ],
+    "lyd_parse_mem_xml.c": [
+      "lyd_parse_data_mem"
+    ],
+    "lys_parse_mem.c": [
+      "lys_parse_mem"
+    ]
+  },
+  "libzip": {
+    "zip_read_fuzzer.cc": [
+      "zip_fread"
+    ]
+  },
+  "lua": {
+    "fuzz_lua.c": [
+      "luaL_loadbufferx"
+    ]
+  },
+  "md4c": {
+    "fuzz-mdhtml.c": [
+      "md_html"
+    ]
+  },
+  "oniguruma": {
+    "base.c": [
+      "onig_new"
+    ]
+  },
+  "pjsip": {
+    "fuzz-json.c": [
+      "pj_json_parse"
+    ],
+    "fuzz-sdp.c": [
+      "pjmedia_sdp_parse"
+    ],
+    "fuzz-sip.c": [
+      "pjsip_parse_msg"
+    ],
+    "fuzz-stun.c": [
+      "pj_stun_msg_decode"
+    ],
+    "fuzz-xml.c": [
+      "pj_xml_parse"
+    ]
+  },
+  "proftpd": {
+    "fuzzer.c": [
+      "pr_json_object_from_text"
+    ]
+  },
+  "pupnp": {
+    "FuzzIxml.c": [
+      "ixmlLoadDocumentEx"
+    ]
+  },
+  "quickjs": {
+    "fuzz_compile.c": [
+      "JS_Eval"
+    ],
+    "fuzz_eval.c": [
+      "JS_Eval"
+    ],
+    "fuzz_regexp.c": [
+      "lre_compile"
+    ]
+  },
+  "selinux": {
+    "binpolicy-fuzzer.c": [
+      "policydb_read"
+    ],
+    "secilc-fuzzer.c": [
+      "cil_compile"
+    ]
+  },
+  "spdk": {
+    "parse_json_fuzzer.cc": [
+      "spdk_json_parse"
+    ]
+  },
+  "tmux": {
+    "input-fuzzer.c": [
+      "input_parse_buffer"
+    ]
+  },
+  "w3m": {
+    "fuzz-conv.c": [
+      "wc_Str_conv_with_detect"
+    ]
+  }
+}

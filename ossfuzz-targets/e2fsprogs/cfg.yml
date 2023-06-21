@@ -1,0 +1,18 @@
+e2fsprogs:
+  language: "c"
+  image: "fuzzdrivergpt/e2fsprogs:env"
+  apiblocklist: [ "^$" ]
+  precode: ''
+  headers: { "/root/workspace/fuzzdrivergpt/install/include" : "**/*" }
+  binaries: [
+"/root/workspace/fuzzdrivergpt/install/lib/libblkid.a","/root/workspace/fuzzdrivergpt/install/lib/libcom_err.a","/root/workspace/fuzzdrivergpt/install/lib/libe2p.a","/root/workspace/fuzzdrivergpt/install/lib/libext2fs.a","/root/workspace/fuzzdrivergpt/install/lib/libss.a","/root/workspace/fuzzdrivergpt/install/lib/libsupport.a","/root/workspace/fuzzdrivergpt/install/lib/libuuid.a","/root/workspace/fuzzdrivergpt/install/lib/blkid/libblkid.a","/root/workspace/fuzzdrivergpt/install/lib/et/libcom_err.a","/root/workspace/fuzzdrivergpt/install/lib/ss/libss.a","/root/workspace/fuzzdrivergpt/install/lib/uuid/libuuid.a","/root/workspace/fuzzdrivergpt/install/lib/e2p/libe2p.a","/root/workspace/fuzzdrivergpt/install/lib/ext2fs/libext2fs.a","/root/workspace/fuzzdrivergpt/install/lib/support/libsupport.a"
+  ]
+  compile: [ "/usr/local/bin/clang-15", "-isystem", "/usr/local/lib/clang/15.0.0/include", "-isystem", "/usr/local/include", "-isystem", "/usr/include/x86_64-linux-gnu", "-isystem", "/usr/include", "-fsanitize=address", "-fsanitize=fuzzer", "-O1","-fno-omit-frame-pointer","-gline-tables-only","-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION","-fsanitize=address","-fsanitize-address-use-after-scope","-fsanitize=fuzzer-no-link","-fsanitize=fuzzer","-I","/root/workspace/fuzzdrivergpt/install/lib" ]
+  build: "COMPBASE OUTFILE  -L/root/workspace/fuzzdrivergpt/install/lib/ext2fs -lext2fs -L/root/workspace/fuzzdrivergpt/install/lib/et -lcom_err  -o OUTEXE"
+  run: "OUTEXE -detect_leaks=0 -max_total_time=60 -timeout=30 -artifact_prefix=ARTIFACTDIR/ -close_fd_mask=3 SEEDDIR"
+  known_drivers: [ "/src/fuzz/ext2fs_check_directory_fuzzer.cc", "/src/fuzz/ext2fs_image_read_write_fuzzer.cc", "/src/fuzz/ext2fs_read_bitmap_fuzzer.cc", ]
+
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer -I /src/e2fsprogs/lib /src/fuzz/ext2fs_read_bitmap_fuzzer.cc -L./lib/ext2fs -lext2fs -L./lib/et -lcom_err -o /out/ext2fs_read_bitmap_fuzzer
+
+#clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -fsanitize=fuzzer -I /root/workspace/fuzzdrivergpt/install/lib  -L/root/workspace/fuzzdrivergpt/install/lib/ext2fs -lext2fs -L/root/workspace/fuzzdrivergpt/install/lib/et -lcom_err
