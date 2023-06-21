@@ -57,6 +57,8 @@ class IterativeQueryRecord:
 		# leafQueryIDs: queries that do not need to be improved any more (has acceptable result or cannot be improved, etc)
 		self.leafQueryIDs = set([])
 
+		os.makedirs('tasks-workdir', exist_ok=True)
+
 	def cleanTmp(self):
 		if os.path.exists(self.localInPath):
 			os.remove(self.localInPath)

@@ -12,9 +12,12 @@ Currently, `fuzzdrivergpt`:
 
 The query strategies haven been tested on 86 APIs from 30 C projects of oss-fuzz, and some strategies can generate effective drivers for 78 (91%) of them with manually refined validation criteria.
 
-## Video demo (coming soon)
+## Video demo
 
-The demo video shows the process of using iterative query strategy to generate valid fuzz drivers for `md_html` from project `md4c`.
+The following video shows the process of using iterative query strategy to generate valid fuzz drivers for `md_html` from project `md4c`.
+`fuzzdrivergpt` generated a fuzz driver with compilation error in the first iteration, then it fixed that error in the following iteration using code fix prompts.
+
+![video demo](doc/demo/demo.svg)
 
 ## Generated fuzz drivers (coming soon)
 
@@ -153,6 +156,7 @@ For advanced users who want to search more and filter hard for better driver gen
 # Todo
 
 - Easier to use
+	- [ ] log refinement
 	- [ ] More documentation
 	- [ ] New process/interface for API targets out of OSS-Fuzz projects
 	- [ ] Automation for API usage collection
