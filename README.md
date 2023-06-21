@@ -12,11 +12,11 @@ Currently, `fuzzdrivergpt`:
 
 The query strategies haven been tested on 86 APIs from 30 C projects of oss-fuzz, and some strategies can generate effective drivers for 78 (91%) of them with manually refined validation criteria.
 
-## Video demo
+## Video demo (coming soon)
 
 The demo video shows the process of using iterative query strategy to generate valid fuzz drivers for `md_html` from project `md4c`.
 
-## Generated fuzz drivers
+## Generated fuzz drivers (coming soon)
 
 See [`examples`](https://github.com/occia/fuzzdrivergpt/tree/main/examples).
 

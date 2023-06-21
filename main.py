@@ -54,7 +54,7 @@ def iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, mode
 			break
 
 	# find a valid response, record and end
-	print('--- Round [%s] finished ---' % (rounds))
+	print('=== Round [%s] finished ===' % (rounds))
 	print('All iteration results:')
 	for qid in query_record.leafQueryIDs:
 		print('qid: %s' % (qid))
