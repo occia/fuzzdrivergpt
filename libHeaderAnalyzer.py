@@ -411,8 +411,7 @@ def get_sourcegraph_usage_functions(cfg, fuzzed_apis, all_apis):
 	merged_results = {}
 
 	# get merged search results
-	sgjson = '/tmp/crawled_usage.json'
-	with open(sgjson) as f:
+	with open(cfg.sgusagejson) as f:
 		proj = cfg.target
 
 		obj = json.load(f)
@@ -514,7 +513,7 @@ def gen_usageid(all_usage_files, all_usage_funcs, usage_file, usage_func):
 
 	return "%s-%s" % (shortname, usage_func)
 
-def gen_XXUGCTX_queries(cfg, fuzzed_apis, all_apis, api_usages, to_chatgpt, cot_level):
+def gen_XXUGCTX_queries(cfg, fuzzed_apis, all_apis, api_usages, to_chatgpt):
 	queries = []
 
 	for mangled_name, info in fuzzed_apis.items():
@@ -525,15 +524,7 @@ def gen_XXUGCTX_queries(cfg, fuzzed_apis, all_apis, api_usages, to_chatgpt, cot_
 		# gen tail
 		fullname = info['fullname']
 		# this is for c
-		TAIL = None
-		if cot_level == 0:
-			TAIL = '// the following function fuzzes %s based on the above API usages\nextern int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {\n' % (fullname)
-		elif cot_level == 1:
-			TAIL = '// the following function fuzzes %s based on the above API usages\n// convert the example to the following function step by step\nextern int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {\n' % (fullname)
-		elif cot_level == 2:
-			TAIL = '// the following function fuzzes %s based on the above API usages\n// convert the example to the following function step by step: first recognize the API usages inside, then adopt the usage for fuzzing, finally generate the correct implementation\nextern int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {\n' % (fullname)
-		else:
-			raise Exception('Unsupported cot level %s' % (cot_level))
+		TAIL = '// the following function fuzzes %s based on the above API usages\nextern int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {\n' % (fullname)
 
 		# 2. for each usage, generate the query
 		if mangled_name in api_usages:
@@ -563,11 +554,11 @@ def gen_XXUGCTX_queries(cfg, fuzzed_apis, all_apis, api_usages, to_chatgpt, cot_
 				FUNC_DECL = '\n'.join(api_func_decls)
 
 				query = '\n\n'.join([INCLUDE, USAGE, FUNC_DECL, TAIL])
-				queryMode = "UGC%s-%s" % (('-COT%s' % (cot_level)) if cot_level != 0 else '', usageid)
+				queryMode = "UGC-%s" % (usageid)
 
 				if to_chatgpt:
 					query = '// The following is a fuzz driver written in C language, complete the implementation. Output the continued code in reply only.\n\n' + query
-					queryMode = 'UGC%s-CHATGPT-%s' %(('-COT%s' % (cot_level)) if cot_level != 0 else '', usageid)
+					queryMode = 'UGC-CHATGPT-%s' %(usageid)
 
 				queries.append({
 					'id': '%s-%s-%s-%s' % (cfg.language, cfg.target, mangled_name, queryMode),
@@ -613,12 +604,12 @@ class BaseAnalyzer:
 				raise Exception('`apt install default-jre -y` error with ret %s' % (ret))
 
 	def analyze_impl(self, queryMode, params):
-		past_query, solution_idx, to_chatgpt, cot_level = None, None, None, None
+		past_query, solution_idx, to_chatgpt = None, None, None
 
 		if queryMode == 'IMPROVE':
 			past_query, solution_idx, aaInfo = params['query'], params['solutionIdx'], params['aaInfo']
 		elif queryMode != 'ANALYZE':
-			to_chatgpt, cot_level = params['toChatGpt'], params['cotLevel']
+			to_chatgpt = params['toChatGpt']
 
 		funcsig = params['funcsig'] if 'funcsig' in params else None
 
@@ -696,7 +687,7 @@ class BaseAnalyzer:
 			api_usages = get_usage_functions(self.cfg, fuzzed_apis, api_funcs)
 
 			# 4. generate usage-ctx queries
-			queries = gen_XXUGCTX_queries(self.cfg, fuzzed_apis, api_funcs, api_usages, to_chatgpt, cot_level)
+			queries = gen_XXUGCTX_queries(self.cfg, fuzzed_apis, api_funcs, api_usages, to_chatgpt)
 
 			return queries
 
@@ -717,7 +708,7 @@ class BaseAnalyzer:
 			api_usages = get_sourcegraph_usage_functions(self.cfg, fuzzed_apis, api_funcs)
 
 			# 4. generate usage-ctx queries
-			queries = gen_XXUGCTX_queries(self.cfg, fuzzed_apis, api_funcs, api_usages, to_chatgpt, cot_level)
+			queries = gen_XXUGCTX_queries(self.cfg, fuzzed_apis, api_funcs, api_usages, to_chatgpt)
 
 			return queries
 
@@ -750,7 +741,7 @@ class BaseAnalyzer:
 			fuzzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
 
 			# 4. generate usage-ctx queries
-			queries = gen_XXUGCTX_queries(self.cfg, fuzzed_apis, api_funcs, api_usages, to_chatgpt, cot_level)
+			queries = gen_XXUGCTX_queries(self.cfg, fuzzed_apis, api_funcs, api_usages, to_chatgpt)
 
 			return queries
 

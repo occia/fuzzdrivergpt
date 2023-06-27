@@ -57,7 +57,7 @@ class ContainerAnalyzer(BaseAnalyzer):
 				dockervolumns.append("%s:/tmp/cc-func-parser-0.5-jar-with-dependencies.jar" % (cfgs.FDGPT_ANTLR))
 
 				if querymode == 'SGUGCTX' or querymode == 'ALLUGCTX' or querymode == 'IMPROVE':
-					dockervolumns.append('%s:%s' % (self.cfg.sgusagejson, self.cfg.sgusagejson))
+					dockervolumns.append('%s:%s' % (cfgs.FDGPT_CRAWLED_USAGE, self.cfg.sgusagejson))
 				
 				if querymode == 'ANALYZE':
 					driverfile = params['targetDriverFile']
@@ -108,16 +108,15 @@ def main():
 
 	subparsers = parser.add_subparsers(help='sub-command help')
 
-	parser_batch = subparsers.add_parser('batch', help='batch generation mode')
-	parser_batch.add_argument('-l', '--language', required=True, help='languages e.g., c/c++/...')
-	parser_batch.add_argument('-D', '--debug', required=False, action='store_true', help='debug mode')
-	parser_batch.add_argument('--chatgpt', required=False, action='store_true', help='query is for chatgpt or not')
-	parser_batch.add_argument('--cotlevel', required=False, type=int, default=0, help='use cot1 in query')
-	#parser_batch.add_argument('-o', '--output', required=False, default='./input_queries.json', help='the file generated query json written to')
-	parser_batch.add_argument('-q', '--querymode', required=True, choices=['NAIVE', 'SMKTST', 'BACTX', 'DOCTX', 'UGCTX', 'SGUGCTX', 'ALLUGCTX'], help='query generation modes')
-	parser_batch.add_argument('-t', '--target', required=True, help='target project')
-	parser_batch.add_argument('-f', '--funcsig', required=True, help='target API function signature')
-	parser_batch.set_defaults(workflow='batch')
+	parser_gen = subparsers.add_parser('gen', help='generate prompt for a given api')
+	parser_gen.add_argument('-l', '--language', required=True, help='languages e.g., c/c++/...')
+	parser_gen.add_argument('-D', '--debug', required=False, action='store_true', help='debug mode')
+	parser_gen.add_argument('--chatgpt', required=False, action='store_true', help='query is for chatgpt or not')
+	#parser_gen.add_argument('-o', '--output', required=False, default='./input_queries.json', help='the file generated query json written to')
+	parser_gen.add_argument('-q', '--querymode', required=True, choices=['NAIVE', 'SMKTST', 'BACTX', 'DOCTX', 'UGCTX', 'SGUGCTX', 'ALLUGCTX'], help='query generation modes')
+	parser_gen.add_argument('-t', '--target', required=True, help='target project')
+	parser_gen.add_argument('-f', '--funcsig', required=True, help='target API function signature')
+	parser_gen.set_defaults(workflow='gen')
 
 	parser_improve = subparsers.add_parser('improve', help='generate improve query')
 	parser_improve.add_argument('-D', '--debug', required=False, action='store_true', help='debug mode')
@@ -228,37 +227,35 @@ def main():
 		with open(out, 'w') as f:
 			json.dump(improve_list, f, indent=2, sort_keys=True)
 
-	elif workflow == 'batch':
+	elif workflow == 'gen':
 		# prepare arg-related vars
 		language = args.language.lower()
-		targets = args.target
+		target = args.target
 		debug = args.debug
 		funcsig = args.funcsig
 		#outfile = args.output
 		querymode = args.querymode
 		to_chatgpt = args.chatgpt
-		cot_level = args.cotlevel
 		buildyml = 'yml/' + language + '.yml'
 
 		print('-' * 30)
 		print('Language: %s' % (language))
-		print('Targets: %s' % (targets))
+		print('Target: %s' % (target))
+		print('FuncSig: %s' % (funcsig))
 		print('Debug: %s' % (debug))
 		#print('Output: %s' % (outfile))
 		print('QueryMode: %s' % (querymode))
 		print('ToChatGPT: %s' % (to_chatgpt))
-		print('CotLevel: %s' % (cot_level))
 		print('BuildYml: %s' % (buildyml))
 		print('-' * 30)
 
 		# main logic
 		queries = []
 
-		for target in targets:
-			print('=== handling %s ===' % (target))
+		print('=== handling %s ===' % (target))
 
-			analyzer = ContainerAnalyzer(TargetCfg(build_cfgs_yml=buildyml, target=target))
-			analyzer.analyze_wrap(querymode, {'toChatGpt': to_chatgpt, 'cotLevel': cot_level, 'funcsig': funcsig})
+		analyzer = ContainerAnalyzer(TargetCfg(build_cfgs_yml=buildyml, target=target))
+		analyzer.analyze_wrap(querymode, {'toChatGpt': to_chatgpt, 'funcsig': funcsig})
 
 		## dump queries to json
 		#with open(outfile, 'w') as f:

@@ -143,7 +143,7 @@ class IterativeQueryRecord:
 
 		cfg = libTarget.TargetCfg(build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
 		analyzer = genQueries.ContainerAnalyzer(cfg)
-		analyzer.analyze_wrap(initialMode, {'toChatGpt': True, 'cotLevel': 0, 'funcsig' : self.funcsig})
+		analyzer.analyze_wrap(initialMode, {'toChatGpt': True, 'funcsig' : self.funcsig})
 		with open(analyzer.cfg.queryfile, 'r') as f:
 			gen_queries = json.load(f)
 			for query in gen_queries:

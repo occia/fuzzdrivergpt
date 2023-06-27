@@ -35,8 +35,7 @@ The following demo shows the process of using iterative query strategy to genera
 OPENAI_APIKEY = your-openai-apikey
 OPENAI_ORGID = your-orgid
 ```
-
-- download [crawled usage](https://drive.google.com/file/d/1c3MaOKmSiPikHlQkVl8TSjLL1zCpv5NO/view?usp=sharing) for supported projects, save as `./meta/crawled_usage.json` (6.6GB example usage for 30 projects based on [sourcegraph](https://sourcegraph.com/search), we will eliminate this step in the near future)
+- install `docker`, [docker install steps](https://docs.docker.com/desktop/install/linux-install/)
 
 - install `jdk-19.0.2` into `./tools/jdk-19.0.2`
 
@@ -63,6 +62,9 @@ deactivate
 # leave the python env 
 deactivate
 ```
+
+- (Optional) install `src-cli` from [SourceGraph doc](https://github.com/sourcegraph/src-cli#installation-linux)
+
 
 ## Usage 
 

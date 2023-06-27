@@ -33,31 +33,37 @@ def get_apikey_cfg(cfgfile):
 			k, v = line.split('=')
 			pairs[k.strip()] = v.strip()
 	
-	return pairs['OPENAI_APIKEY'], pairs['OPENAI_ORGID'], pairs['SOURCEGRAPH_TOKEN']
+	return pairs['OPENAI_APIKEY'], pairs['OPENAI_ORGID']
 
 FDGPT_APIKEY_FILE = os.path.join(FDGPT_DIR, 'apikey.txt')
-FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID, FDGPT_SG_TOKEN = None, None, None
+FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID = None, None
 
 def check_and_load_cfgs():
-	global FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID, FDGPT_SG_TOKEN
+	global FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID
 
 	if not os.path.exists(FDGPT_JDK):
 		print("[ERROR] jdk '%s' not found" % (FDGPT_JDK))
 		return False
+
 	if not os.path.exists(FDGPT_ANTLR):
 		print("[ERROR] antlr jar '%s' not found" % (FDGPT_ANTLR))
 		return False
-	if not os.path.exists(FDGPT_CRAWLED_USAGE):
-		print("[ERROR] crawled usage '%s' not found" % (FDGPT_CRAWLED_USAGE))
-		return False
+
 	if not os.path.exists(FDGPT_OSSFUZZ_TARGETS):
 		print("[ERROR] ossfuzz targets '%s' not found" % (FDGPT_OSSFUZZ_TARGETS))
 		return False
+
 	if not os.path.exists(FDGPT_APIKEY_FILE):
 		print("[ERROR] apikey cfg file '%s' not found" % (FDGPT_APIKEY_FILE))
 		return False
 
-	FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID, FDGPT_SG_TOKEN = get_apikey_cfg(FDGPT_APIKEY_FILE)
+	FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID = get_apikey_cfg(FDGPT_APIKEY_FILE)
+
+	if not os.path.exists(FDGPT_CRAWLED_USAGE):
+		print("[WARN] crawled usage '%s' not found, create an empty one and the examples used in prompts will only be picked from the local repository" % (FDGPT_CRAWLED_USAGE))
+		with open(FDGPT_CRAWLED_USAGE, 'w') as f:
+			f.write('{}')
+
 	return True
 
 if __name__ == '__main__':
