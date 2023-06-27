@@ -1,5 +1,6 @@
 __pycache__
 openaikey.txt
+apikey.txt
 venv
 targets
 tasks-workdir

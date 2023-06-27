@@ -20,8 +20,8 @@ FDGPT_CRAWLED_USAGE = os.path.join(FDGPT_DIR, 'meta', 'crawled_usage.json')
 # ossfuzz supports
 FDGPT_OSSFUZZ_TARGETS = os.path.join(FDGPT_DIR, 'ossfuzz-targets')
 
-# openai cfg
-def get_openai_cfg(cfgfile):
+# apikey cfg
+def get_apikey_cfg(cfgfile):
 	pairs = {}
 	with open(cfgfile, 'r') as f:
 		for line in f.readlines():
@@ -33,13 +33,13 @@ def get_openai_cfg(cfgfile):
 			k, v = line.split('=')
 			pairs[k.strip()] = v.strip()
 	
-	return pairs['OPENAI_APIKEY'], pairs['OPENAI_ORGID']
+	return pairs['OPENAI_APIKEY'], pairs['OPENAI_ORGID'], pairs['SOURCEGRAPH_TOKEN']
 
-FDGPT_OPENAI_CFG = os.path.join(FDGPT_DIR, 'openaikey.txt')
-FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID = None, None
+FDGPT_APIKEY_FILE = os.path.join(FDGPT_DIR, 'apikey.txt')
+FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID, FDGPT_SG_TOKEN = None, None, None
 
 def check_and_load_cfgs():
-	global FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID
+	global FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID, FDGPT_SG_TOKEN
 
 	if not os.path.exists(FDGPT_JDK):
 		print("[ERROR] jdk '%s' not found" % (FDGPT_JDK))
@@ -53,11 +53,11 @@ def check_and_load_cfgs():
 	if not os.path.exists(FDGPT_OSSFUZZ_TARGETS):
 		print("[ERROR] ossfuzz targets '%s' not found" % (FDGPT_OSSFUZZ_TARGETS))
 		return False
-	if not os.path.exists(FDGPT_OPENAI_CFG):
-		print("[ERROR] openai cfg '%s' not found" % (FDGPT_OPENAI_CFG))
+	if not os.path.exists(FDGPT_APIKEY_FILE):
+		print("[ERROR] apikey cfg file '%s' not found" % (FDGPT_APIKEY_FILE))
 		return False
 
-	FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID = get_openai_cfg(FDGPT_OPENAI_CFG)
+	FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID, FDGPT_SG_TOKEN = get_apikey_cfg(FDGPT_APIKEY_FILE)
 	return True
 
 if __name__ == '__main__':
