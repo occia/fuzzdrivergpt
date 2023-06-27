@@ -237,23 +237,6 @@ def refine_list_using_header_analysis(cfg, funcs):
 
 	return filtered_funcs
 
-def getbenchmarkapis(cfg, api_funcs):
-	fuzzed_apis = {}
-
-	apis = set([])
-	with open('/tmp/benchmarkapis.json') as f:
-		obj = json.load(f)
-		if cfg.target in obj:
-			for driver, _apis in obj[cfg.target].items():
-				apis.update(_apis)
-
-	for func in apis:
-		if func in api_funcs:
-			# we are in c language now, therefore the signature equals to the function name
-			fuzzed_apis[func] = api_funcs[func]
-
-	return fuzzed_apis
-
 def find_exported_func_sig_list(binaries):
 	apis = set()
 	for binary in binaries:
@@ -637,6 +620,8 @@ class BaseAnalyzer:
 		elif queryMode != 'ANALYZE':
 			to_chatgpt, cot_level = params['toChatGpt'], params['cotLevel']
 
+		funcsig = params['funcsig'] if 'funcsig' in params else None
+
 		if queryMode == 'NAIVE':
 			#
 			# phase one: we get the api list
@@ -653,7 +638,7 @@ class BaseAnalyzer:
 			api_funcs = refine_list_using_header_analysis(self.cfg, funcs)
 			#print(api_funcs)
 
-			fuzzed_apis = getbenchmarkapis(self.cfg, api_funcs)
+			fuzzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
 
 			#
 			# phase two: we generate the query of api
@@ -679,8 +664,9 @@ class BaseAnalyzer:
 			api_funcs = refine_list_using_header_analysis(self.cfg, funcs)
 			#print(api_funcs)
 
+			fuzzed_apis = None
 			if queryMode == 'BACTX' or queryMode == 'DOCTX':
-				fuzzed_apis = getbenchmarkapis(self.cfg, api_funcs)
+				fuzzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
 			elif queryMode == 'SMKTST':
 				fuzzed_apis = api_funcs
 
@@ -704,7 +690,7 @@ class BaseAnalyzer:
 
 			# 2. get api list fuzzed in existing ossfuzz drivers
 			#fuzzed_apis = get_apis_fuzzed_by_ossfuzz_drivers(self.cfg, api_funcs)
-			fuzzed_apis = getbenchmarkapis(self.cfg, api_funcs)
+			fuzzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
 
 			# 3. get functions used these apis
 			api_usages = get_usage_functions(self.cfg, fuzzed_apis, api_funcs)
@@ -725,7 +711,7 @@ class BaseAnalyzer:
 			api_funcs = refine_list_using_header_analysis(self.cfg, [])
 
 			# 2. get fuzzing target apis from benchmarkapis.json
-			fuzzed_apis = getbenchmarkapis(self.cfg, api_funcs)
+			fuzzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
 
 			# 3. get functions used these apis
 			api_usages = get_sourcegraph_usage_functions(self.cfg, fuzzed_apis, api_funcs)
@@ -761,7 +747,7 @@ class BaseAnalyzer:
 				pickle.dump({'api_funcs': api_funcs, 'api_usages': api_usages}, open(self.cfg.apicachepickle, 'wb'))
 
 			# 3. get fuzzing target apis from benchmarkapis.json
-			fuzzed_apis = getbenchmarkapis(self.cfg, api_funcs)
+			fuzzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
 
 			# 4. generate usage-ctx queries
 			queries = gen_XXUGCTX_queries(self.cfg, fuzzed_apis, api_funcs, api_usages, to_chatgpt, cot_level)

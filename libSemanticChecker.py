@@ -658,10 +658,10 @@ checker_list = [
 	parse_to_header_Checker,
 	parse_to_uri_Checker,
 	# AlwaysInvalidChecker
-	civetweb_mg_get_response_Checker,
-	libmodbus_modbus_read_bits_Checker,
-	libmodbus_modbus_read_registers_Checker,
-	libmodbus_modbus_receive_Checker,
+	#civetweb_mg_get_response_Checker,
+	#libmodbus_modbus_read_bits_Checker,
+	#libmodbus_modbus_read_registers_Checker,
+	#libmodbus_modbus_receive_Checker,
 	###
 	# FN checkers
 	###

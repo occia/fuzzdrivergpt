@@ -97,7 +97,7 @@ class IterativeQueryRecord:
 
 		cfg = libTarget.TargetCfg(build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
 		analyzer = genQueries.ContainerAnalyzer(cfg)
-		analyzer.analyze_wrap('IMPROVE', {'query': last_query, 'solutionIdx': 0, 'aaInfo': True})
+		analyzer.analyze_wrap('IMPROVE', {'query': last_query, 'solutionIdx': 0, 'aaInfo': True, 'funcsig' : self.funcsig})
 
 		with open(analyzer.cfg.queryfile, 'r') as f:
 			next_query_ctnts = json.load(f)
@@ -118,7 +118,7 @@ class IterativeQueryRecord:
 
 		cfg = libTarget.TargetCfg(build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
 		analyzer = genQueries.ContainerAnalyzer(cfg)
-		analyzer.analyze_wrap('IMPROVE', {'query': last_query, 'solutionIdx': 0, 'aaInfo': False})
+		analyzer.analyze_wrap('IMPROVE', {'query': last_query, 'solutionIdx': 0, 'aaInfo': False, 'funcsig': self.funcsig})
 
 		with open(analyzer.cfg.queryfile, 'r') as f:
 			next_query_ctnts = json.load(f)
@@ -143,7 +143,7 @@ class IterativeQueryRecord:
 
 		cfg = libTarget.TargetCfg(build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
 		analyzer = genQueries.ContainerAnalyzer(cfg)
-		analyzer.analyze_wrap(initialMode, {'toChatGpt': True, 'cotLevel': 0})
+		analyzer.analyze_wrap(initialMode, {'toChatGpt': True, 'cotLevel': 0, 'funcsig' : self.funcsig})
 		with open(analyzer.cfg.queryfile, 'r') as f:
 			gen_queries = json.load(f)
 			for query in gen_queries:

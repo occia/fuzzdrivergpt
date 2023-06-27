@@ -46,7 +46,6 @@ class ContainerAnalyzer(BaseAnalyzer):
 				'%s/libTarget.py:/root/workspace/fuzzdrivergpt/libTarget.py' % (cfgs.get_proj_dir()),
 				'%s/libHeaderAnalyzer.py:/root/workspace/fuzzdrivergpt/libHeaderAnalyzer.py' % (cfgs.get_proj_dir()),
 				'%s/libManualAPIDoc.py:/root/workspace/fuzzdrivergpt/libManualAPIDoc.py' % (cfgs.get_proj_dir()),
-				'%s/meta/benchmarkapis.json:/tmp/benchmarkapis.json' % (cfgs.get_proj_dir()),
 				'%s/libImproveQueryGen.py:/root/workspace/fuzzdrivergpt/libImproveQueryGen.py' % (cfgs.get_proj_dir()),
 				'%s/libVR.py:/root/workspace/fuzzdrivergpt/libVR.py' % (cfgs.get_proj_dir()),
 			]
@@ -58,7 +57,7 @@ class ContainerAnalyzer(BaseAnalyzer):
 				dockervolumns.append("%s:/tmp/cc-func-parser-0.5-jar-with-dependencies.jar" % (cfgs.FDGPT_ANTLR))
 
 				if querymode == 'SGUGCTX' or querymode == 'ALLUGCTX' or querymode == 'IMPROVE':
-					dockervolumns.append("%s:/tmp/crawled_usage.json" % (cfgs.FDGPT_CRAWLED_USAGE))
+					dockervolumns.append('%s:%s' % (self.cfg.sgusagejson, self.cfg.sgusagejson))
 				
 				if querymode == 'ANALYZE':
 					driverfile = params['targetDriverFile']
@@ -116,7 +115,8 @@ def main():
 	parser_batch.add_argument('--cotlevel', required=False, type=int, default=0, help='use cot1 in query')
 	#parser_batch.add_argument('-o', '--output', required=False, default='./input_queries.json', help='the file generated query json written to')
 	parser_batch.add_argument('-q', '--querymode', required=True, choices=['NAIVE', 'SMKTST', 'BACTX', 'DOCTX', 'UGCTX', 'SGUGCTX', 'ALLUGCTX'], help='query generation modes')
-	parser_batch.add_argument('target', nargs='+', help='target project names e.g., jsonnet/libaom/...')
+	parser_batch.add_argument('-t', '--target', required=True, help='target project')
+	parser_batch.add_argument('-f', '--funcsig', required=True, help='target API function signature')
 	parser_batch.set_defaults(workflow='batch')
 
 	parser_improve = subparsers.add_parser('improve', help='generate improve query')
@@ -233,6 +233,7 @@ def main():
 		language = args.language.lower()
 		targets = args.target
 		debug = args.debug
+		funcsig = args.funcsig
 		#outfile = args.output
 		querymode = args.querymode
 		to_chatgpt = args.chatgpt
@@ -257,7 +258,7 @@ def main():
 			print('=== handling %s ===' % (target))
 
 			analyzer = ContainerAnalyzer(TargetCfg(build_cfgs_yml=buildyml, target=target))
-			analyzer.analyze_wrap(querymode, {'toChatGpt': to_chatgpt, 'cotLevel': cot_level})
+			analyzer.analyze_wrap(querymode, {'toChatGpt': to_chatgpt, 'cotLevel': cot_level, 'funcsig': funcsig})
 
 		## dump queries to json
 		#with open(outfile, 'w') as f:

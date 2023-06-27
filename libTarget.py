@@ -99,6 +99,7 @@ class TargetCfg:
 		self.runcmd_subprocess = [ "bash", "-x", "/tmp/fuzz.sh" ]
 
 		self.testcase = os.path.join(self.workdir, 'testcase')
+		self.sgusagejson = os.path.join(self.workdir, 'sgusage.json')
 		self.testexe = os.path.join(self.workdir, 'dummytester')
 		self.testlog = os.path.join(self.workdir, 'test.log')
 		self.testbuildcmd = self.cfgs['build'].replace('COMPBASE' ,' '.join(self.compileopts)).replace('OUTFILE', self.testfile).replace('OUTEXE', self.testexe).replace('-fsanitize=fuzzer-no-link', '').replace('-fsanitize=fuzzer', '')
