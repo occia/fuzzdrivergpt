@@ -1,7 +1,7 @@
-import copy
 import os
-import pickle
 import re
+import copy
+import pickle
 from pathlib import Path
 
 try:
@@ -11,7 +11,7 @@ except Exception as ex:
 
 class TargetCfg:
 
-	def __init__(self, cfgs=None, build_cfgs_yml=None, target=None, task_idx=None, basedir='.', workdir=None):
+	def __init__(self, basedir, cfgs=None, build_cfgs_yml=None, target=None, task_idx=None, workdir=None):
 		#
 		# task_idx is used for unique naming in parallel scenario
 		#

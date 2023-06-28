@@ -40,7 +40,7 @@ The following demo shows the process of using iterative query strategy to genera
 bash install-pre.sh YOUR-OPENAI-KEY YOUR-OPENAI-ORGID
 ```
 
-After finish the above, use `. venv/bin/activate` to enter the python environment for running `fuzzdrivergpt`.
+After finishing the above, use `. venv/bin/activate` to enter the python environment for running `fuzzdrivergpt`.
 
 ## Usage 
 
@@ -140,9 +140,10 @@ For advanced users who want to search more and filter hard for better driver gen
 	- [ ] Automation for API usage collection
 	- [ ] Refine the heavy, manual prerequisites installation process
 
-- More functionality
+- More functionalities
 	- [ ] Driver enhance mode (not generate from scratch but from a working one!)
 	- [ ] Manual configuration of the driver effectiveness validation 
+	- [ ] Generate fuzz driver for closed-source APIs
 
 - More programming languages
 

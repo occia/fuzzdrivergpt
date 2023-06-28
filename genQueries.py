@@ -40,14 +40,15 @@ class ContainerAnalyzer(BaseAnalyzer):
 				dockercmd = 'sleep 10h'
 			imagename = self.cfg.imagename
 			dockervolumns = [
-				#'%s/targets/%s:/root/workspace/fuzzdrivergpt/install' % (cfgs.get_proj_dir(), self.cfg.target),
+				#'%s/targets/%s:/root/workspace/fuzzdrivergpt/install' % (cfgs.FDGPT_DIR, self.cfg.target),
 				'%s:%s' % (self.cfg.workdir, self.cfg.workdir),
 				'%s:%s' % (self.cfg.cachedir, self.cfg.cachedir),
-				'%s/libTarget.py:/root/workspace/fuzzdrivergpt/libTarget.py' % (cfgs.get_proj_dir()),
-				'%s/libHeaderAnalyzer.py:/root/workspace/fuzzdrivergpt/libHeaderAnalyzer.py' % (cfgs.get_proj_dir()),
-				'%s/libManualAPIDoc.py:/root/workspace/fuzzdrivergpt/libManualAPIDoc.py' % (cfgs.get_proj_dir()),
-				'%s/libImproveQueryGen.py:/root/workspace/fuzzdrivergpt/libImproveQueryGen.py' % (cfgs.get_proj_dir()),
-				'%s/libVR.py:/root/workspace/fuzzdrivergpt/libVR.py' % (cfgs.get_proj_dir()),
+				'%s/libTarget.py:/root/workspace/fuzzdrivergpt/libTarget.py' % (cfgs.FDGPT_DIR),
+				'%s/libHeaderAnalyzer.py:/root/workspace/fuzzdrivergpt/libHeaderAnalyzer.py' % (cfgs.FDGPT_DIR),
+				'%s/libManualAPIDoc.py:/root/workspace/fuzzdrivergpt/libManualAPIDoc.py' % (cfgs.FDGPT_DIR),
+				'%s/libImproveQueryGen.py:/root/workspace/fuzzdrivergpt/libImproveQueryGen.py' % (cfgs.FDGPT_DIR),
+				'%s/libVR.py:/root/workspace/fuzzdrivergpt/libVR.py' % (cfgs.FDGPT_DIR),
+				'%s/cfgs.py:/root/workspace/fuzzdrivergpt/cfgs.py' % (cfgs.FDGPT_DIR),
 			]
 
 			if querymode == 'UGCTX' or querymode == 'SGUGCTX' or querymode == 'ALLUGCTX' or querymode == 'IMPROVE' or querymode == 'ANALYZE':
@@ -90,7 +91,8 @@ class ContainerAnalyzer(BaseAnalyzer):
 			self.docker.reload()
 			rets = self.docker.wait()
 			if rets['StatusCode'] != 0:
-				print('container does not start as expected, check the logs:\n%s' % (self.docker.logs()))
+				print('>> Container does not start as expected, check the logs inside the docker:\n\n%s\n' % (self.docker.logs().decode('utf-8', errors='ignore')))
+				print('>> Stack track outside container:')
 				raise Exception('starting container meets error')
 			
 			self.docker.remove(force=True)
@@ -174,7 +176,7 @@ def main():
 		print('BuildYml: %s' % (buildyml))
 		print('-' * 30)
 
-		analyzer = ContainerAnalyzer(TargetCfg(build_cfgs_yml=buildyml, target=target))
+		analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR,build_cfgs_yml=buildyml, target=target))
 		analyzer.analyze_wrap('IMPROVE', {'query': query, 'solutionIdx': solutionidx, 'aaInfo': aainfo})
 		with open(analyzer.cfg.queryfile, 'r') as f:
 			queries = json.load(f)
@@ -203,7 +205,7 @@ def main():
 			queryid = query['id']
 			solutionidx = 0
 
-			analyzer = ContainerAnalyzer(TargetCfg(build_cfgs_yml=buildyml, target=target))
+			analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
 			analyzer.analyze_wrap('IMPROVE', {'query': query, 'solutionIdx': solutionidx, 'aaInfo': aainfo})
 
 			with open(analyzer.cfg.queryfile, 'r') as f:
@@ -254,7 +256,7 @@ def main():
 
 		print('=== handling %s ===' % (target))
 
-		analyzer = ContainerAnalyzer(TargetCfg(build_cfgs_yml=buildyml, target=target))
+		analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
 		analyzer.analyze_wrap(querymode, {'toChatGpt': to_chatgpt, 'funcsig': funcsig})
 
 		## dump queries to json
@@ -277,7 +279,7 @@ def main():
 		print('OutJsonFile: %s' % (outjsonfile))
 		print('-' * 30)
 
-		analyzer = ContainerAnalyzer(TargetCfg(build_cfgs_yml=buildyml, target=target))
+		analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
 		analyzer.analyze_wrap('ANALYZE', {'targetDriverFile': targetdriverfile, 'outJsonFile': outjsonfile})
 
 if __name__ == '__main__':

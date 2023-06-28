@@ -117,6 +117,7 @@ class ContainerValidator(BaseValidator):
 			'%s/libValidator.py:/root/workspace/fuzzdrivergpt/libValidator.py' % (cfgs.FDGPT_DIR),
 			'%s/libSemanticChecker.py:/root/workspace/fuzzdrivergpt/libSemanticChecker.py' % (cfgs.FDGPT_DIR),
 			'%s/meta/benchapidata.json:/root/workspace/fuzzdrivergpt/meta/benchapidata.json' % (cfgs.FDGPT_DIR),
+			'%s/cfgs.py:/root/workspace/fuzzdrivergpt/cfgs.py' % (cfgs.FDGPT_DIR),
 		]
 		env = [
 			'FUZZING_ENGINE=libfuzzer',
@@ -194,7 +195,7 @@ def validate_do_func(task_idx, lock, args):
 		check_fuzz_fns = rslt['check_fuzz_fns']
 
 	#print('lock %s' % (lock))
-	validator = ContainerValidator(TargetCfg(build_cfgs_yml=buildyml, target=target, task_idx=('%s%s' % (g_task_id, task_idx))), lock)
+	validator = ContainerValidator(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target, task_idx=('%s%s' % (g_task_id, task_idx))), lock)
 
 	vali_rslt = {}
 

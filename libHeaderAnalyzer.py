@@ -701,7 +701,7 @@ class BaseAnalyzer:
 			#      - currently we didn't include the C++ template functions
 			api_funcs = refine_list_using_header_analysis(self.cfg, [])
 
-			# 2. get fuzzing target apis from benchmarkapis.json
+			# 2. get fuzzing target api info
 			fuzzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
 
 			# 3. get functions used these apis
@@ -737,7 +737,7 @@ class BaseAnalyzer:
 				# 3. save as cache for future use 
 				pickle.dump({'api_funcs': api_funcs, 'api_usages': api_usages}, open(self.cfg.apicachepickle, 'wb'))
 
-			# 3. get fuzzing target apis from benchmarkapis.json
+			# 3. get fuzzing target api info
 			fuzzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
 
 			# 4. generate usage-ctx queries

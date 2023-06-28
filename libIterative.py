@@ -11,6 +11,7 @@ import requests
 
 import argparse
 
+import cfgs
 import libVR
 import libQuery
 import libTarget
@@ -35,8 +36,8 @@ class IterativeQueryRecord:
 		self.id = str(uuid.uuid4())
 		self.qid_bases = set([])
 		self.remotePathPrefix = '/root/workspace/remote-sshfs'
-		self.localInPath = 'tasks-workdir/queries-%s.json' % (self.id)
-		self.localOutPath = 'tasks-workdir/validations-%s.json' % (self.id)
+		self.localInPath = '%s/tasks/queries-%s.json' % (cfgs.FDGPT_WORKDIR, self.id)
+		self.localOutPath = '%s/tasks/validations-%s.json' % (cfgs.FDGPT_WORKDIR, self.id)
 		self.remoteInPath = '%s/%s' % (self.remotePathPrefix, self.localInPath)
 		self.remoteOutPath = '%s/%s' % (self.remotePathPrefix, self.localOutPath)
 
@@ -57,7 +58,7 @@ class IterativeQueryRecord:
 		# leafQueryIDs: queries that do not need to be improved any more (has acceptable result or cannot be improved, etc)
 		self.leafQueryIDs = set([])
 
-		os.makedirs('tasks-workdir', exist_ok=True)
+		os.makedirs('%s/tasks' % (cfgs.FDGPT_WORKDIR), exist_ok=True)
 
 	def cleanTmp(self):
 		if os.path.exists(self.localInPath):
@@ -95,7 +96,7 @@ class IterativeQueryRecord:
 	def generateAAQueries(self, last_query):
 		next_queries = []
 
-		cfg = libTarget.TargetCfg(build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
+		cfg = libTarget.TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
 		analyzer = genQueries.ContainerAnalyzer(cfg)
 		analyzer.analyze_wrap('IMPROVE', {'query': last_query, 'solutionIdx': 0, 'aaInfo': True, 'funcsig' : self.funcsig})
 
@@ -116,7 +117,7 @@ class IterativeQueryRecord:
 	def generateBAQueries(self, last_query):
 		next_queries = []
 
-		cfg = libTarget.TargetCfg(build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
+		cfg = libTarget.TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
 		analyzer = genQueries.ContainerAnalyzer(cfg)
 		analyzer.analyze_wrap('IMPROVE', {'query': last_query, 'solutionIdx': 0, 'aaInfo': False, 'funcsig': self.funcsig})
 
@@ -141,9 +142,9 @@ class IterativeQueryRecord:
 	def generateInitialQueries(self, initialMode):
 		queries = []
 
-		cfg = libTarget.TargetCfg(build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
+		cfg = libTarget.TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
 		analyzer = genQueries.ContainerAnalyzer(cfg)
-		analyzer.analyze_wrap(initialMode, {'toChatGpt': True, 'funcsig' : self.funcsig})
+		analyzer.analyze_wrap(initialMode, {'toChatGpt': True, 'funcsig': self.funcsig})
 		with open(analyzer.cfg.queryfile, 'r') as f:
 			gen_queries = json.load(f)
 			for query in gen_queries:

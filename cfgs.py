@@ -9,6 +9,8 @@ def get_proj_dir():
 
 # base dir
 FDGPT_DIR = get_proj_dir()
+# work dir
+FDGPT_WORKDIR = os.path.join(FDGPT_DIR, 'workdir')
 
 # tools
 FDGPT_JDK = os.path.join(FDGPT_DIR, 'tools', 'jdk-19.0.2')
