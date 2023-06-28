@@ -97,8 +97,10 @@ python main.py -l c -m gpt-4-0314 -t md4c -f md_html -q ITER-BA -MI 20 -MR 3 -o 
 
 ### Result interpretation
 
-- Read summary from command line output (coming soon)
-- View whole taxonomized detail in local website (coming soon)
+All results and details of prompts, validations, and driver codes can be found in output jsons.
+
+- Detailed doc for output json format (coming soon)
+- View local websites (coming soon)
 
 ### Tested APIs
 
