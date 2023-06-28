@@ -27,19 +27,19 @@ def iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, mode
 		iterations += 1
 
 		# generate query
-		logger.info('--- ROUND [%s] Iteration [%s]: generate query' % (rounds, iterations))
+		logger.info('--- ROUND [%s] ITER [%s]: Generating prompt(s)' % (rounds, iterations))
 		query_record.generateNextQueries()
 
 		logger.debug('current generated queries are: %s' % (query_record.curQueryIDs))
 		if len(query_record.curQueryIDs) == 0:
-			logger.info('--- No more queries to generate, stop ---')
+			logger.info('--- No prompts can be generated, stop ---')
 			break
 
 		# get response of query 
-		logger.info('--- ROUND [%s] Iteration [%s]: get response' % (rounds, iterations))
+		logger.info('--- ROUND [%s] ITER [%s]: Synthesizing fuzz driver(s) using %s' % (rounds, iterations, query_record.curQueryIDs))
 		query_record.doRemoteQuery()
 		if len(query_record.curQueryIDs) == 0:
-			logger.info('--- No more queries to generate, stop ---')
+			logger.info('--- No drivers can be generated, stop ---')
 			break
 
 		if disablevalidation:
@@ -47,17 +47,21 @@ def iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, mode
 			break
 
 		# validate the response
-		logger.info('--- ROUND [%s] Iteration [%s]: validate response' % (rounds, iterations))
-		query_record.doRemoteValidation()
+		logger.info('--- ROUND [%s] ITER [%s]: Validating synthesized driver(s)' % (rounds, iterations))
+		query_record.doValidation()
+
+		logger.info('--- ROUND [%s] ITER [%s]: Validation result(s): %s' % (rounds, iterations, [ query_record.getValidationBrief(qid) for qid in query_record.curQueryIDs ]))
 
 		if query_record.hasAcceptableResults():
+			logger.info('--- ROUND [%s] ITER [%s]: Found acceptable driver' % (rounds, iterations))
 			break
 
 		if iterations >= maxiterations:
+			logger.info('--- ROUND [%s]: maximum iteration number reached' % (rounds))
 			break
 
 	# find a valid response, record and end
-	logger.info('=== Round [%s] finished ===' % (rounds))
+	logger.info('=== ROUND [%s] finished, summary: ===' % (rounds))
 	logger.debug('All iteration results:')
 	for qid in query_record.leafQueryIDs:
 		logger.debug('qid: %s' % (qid))
@@ -73,7 +77,9 @@ def iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, mode
 	#with open(round_outputpickle.replace('.json', '.pickle'), 'wb') as f:
 	#	pickle.dump(query_record, f)
 
-	return query_record
+	valid_driver_locations = [ (round_outputjson, qid) for qid in query_record.getAcceptableResults() ]
+
+	return valid_driver_locations
 
 def main_workflow(language, model, target, funcsig, querystrategy, disablevalidation, maxiterations, maxrounds, outputjson):
 	rounds = 0
@@ -98,11 +104,14 @@ def main_workflow(language, model, target, funcsig, querystrategy, disablevalida
 
 		logger.info('=== ROUND [%s] start ===' % (rounds))
 
-		query_record = iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, model, language, target, funcsig, improvestrategy, disablevalidation, outputjson)
+		valid_driver_locations = iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, model, language, target, funcsig, improvestrategy, disablevalidation, outputjson)
 
 		if not disablevalidation:
-			if query_record.hasAcceptableResults():
-				logger.info('=== ROUND [%s] has generated valid fuzz driver, exit ===' % (rounds))
+			if len(valid_driver_locations) > 0:
+				logger.info('=== ROUND [%s] has generated valid fuzz driver(s), exiting ===' % (rounds))
+				logger.info('=== Use the following command to check the valid driver(s)')
+				for (round_outputjson, qid) in valid_driver_locations:
+					logger.info('  python jsonOps.py %s %s' % (round_outputjson, qid))
 				break
 
 		if rounds >= maxrounds:

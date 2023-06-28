@@ -72,10 +72,10 @@ class IterativeQueryRecord:
 	def printQuery(self, qid):
 		query = self.queries[qid]
 		if 'validations' not in query['result']:
-			print('%s -> %s' % (qid, query['result']['status'])) 
+			logger.info('%s -> %s' % (qid, query['result']['status'])) 
 		else:
 			vr = libVR.BasicVR.load(query['result']['validations'][0]['vali_result'])
-			print('%s -> %s' % (qid, vr.taxon)) 
+			logger.info('%s -> %s' % (qid, vr.taxon)) 
 
 	def printIterationProcess(self, qid):
 		query = self.queries[qid]
@@ -327,7 +327,7 @@ class IterativeQueryRecord:
 		self._do_validation_locally(qids)
 		#self._do_validation_remotely(qids)
 
-	def doRemoteValidation(self):
+	def doValidation(self):
 		self._do_validation(self.curQueryIDs)
 
 	def doAdditionalCheckForLeaves(self):
@@ -350,6 +350,14 @@ class IterativeQueryRecord:
 			#		return True
 		
 		return False
+
+	def getValidationBrief(self, qid):
+		if self.queries[qid]['result']['status'] == 'FinishedNormally':
+			vali_result = self.queries[qid]['result']['validations'][0]['vali_result']
+			vr = libVR.BasicVR.load(vali_result)
+			return vr.taxon
+		else:
+			return 'unknown validation result'
 
 	def refreshResultsIDs(self):
 		self.acceptQueryIDs = set([])
@@ -374,6 +382,11 @@ class IterativeQueryRecord:
 		self.refreshResultsIDs()
 
 		return len(self.acceptQueryIDs) > 0
+	
+	def getAcceptableResults(self):
+		self.refreshResultsIDs()
+
+		return self.acceptQueryIDs
 
 def summary(patterns, files):
 	# load IterativeQueryRecord from pickle
