@@ -18,6 +18,9 @@ import libTarget
 import genQueries
 import handleChatGPTResult
 
+import logging
+logger = logging.getLogger(__name__)
+
 class IterativeQueryRecord:
 	def __init__(self, model, language, target, funcsig, improvestrategy, validatorUrl, headersAuth, initialQueryMode, recordIdx):
 		self.model = model
@@ -229,7 +232,7 @@ class IterativeQueryRecord:
 
 			failed_ids = []
 			for query_id in query_ids:
-				print('querying ' + query_id + '...')
+				logger.debug('querying ' + query_id + '...')
 				query = self.queries[query_id]
 				query['query'] = libQuery.shrink_query_usage_if_can(self.model, query['query'])
 				query['result'] = libQuery.resilient_wrapper_query(self.model, query['query'])
@@ -268,7 +271,7 @@ class IterativeQueryRecord:
 			if ret == 0:
 				break
 			else:
-				print('Failed to validate queries, retrying...')
+				logger.warning('Failed to validate queries, retrying...')
 		
 		# load validation result
 		with open(self.localOutPath, 'r') as f:
@@ -394,7 +397,7 @@ def summary(patterns, files):
 			with open(file, 'rb') as f:
 				iqr = pickle.load(f)
 				iqr.refreshResultsIDs()
-				#print('iqr %s %s %s %s %s' % (iqr.model, iqr.target, iqr.funcsig, iqr.improvestrategy, iqr.hasAcceptableResults()))
+				#logger.debug('iqr %s %s %s %s %s' % (iqr.model, iqr.target, iqr.funcsig, iqr.improvestrategy, iqr.hasAcceptableResults()))
 
 				qstn = (iqr.target, iqr.funcsig)
 
@@ -623,7 +626,7 @@ def main():
 		exit(1)	
 
 	elif workflow == 'summary':
-		print('Running summary...')
+		logger.info('Running summary...')
 
 		patterns = args.patterns
 		files = args.files
@@ -636,7 +639,7 @@ def main():
 		summary(patterns, files)
 
 	elif workflow == 'detail':
-		print('Running detail...')
+		logger.info('Running detail...')
 
 		file = args.file
 		verbose = args.verbose
@@ -649,7 +652,7 @@ def main():
 		detail(file, verbose)
 	
 	elif workflow == 'addsemacheck':
-		print('Running addsemacheck...')
+		logger.info('Running addsemacheck...')
 
 		files = args.files
 
@@ -660,7 +663,7 @@ def main():
 		addsemacheck(files)
 	
 	elif workflow == 'trunclongquery':
-		print('Truncating long query and requery...')
+		logger.info('Truncating long query and requery...')
 
 		files = args.files
 		accountidx = args.accountidx

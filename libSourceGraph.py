@@ -4,16 +4,19 @@ import subprocess
 import sys
 import time
 
+import logging
+logger = logging.getLogger(__name__)
+
 def do_sg_query(api):
     while True:
         try:
-            print('  do query for api %s' % (api))
+            logger.info('  do query for api %s' % (api))
             output = subprocess.check_output(f'src search -json "file:.*\.c lang:c count:all {api}"',shell=True)
             return json.loads(output.decode("utf-8"))
 
         except Exception as e:
-            print('meet exception when crawling %s' % (e))
-            print('sleep 20s and try again')
+            logger.warning('meet exception when crawling %s' % (e))
+            logger.warning('sleep 20s and try again')
             time.sleep(20)
 
 def main():
@@ -27,7 +30,7 @@ def main():
     #
     # test crawl & save 
     #
-    print('====== crawling api usage of %s/%s ======' % (proj, api))
+    logger.info('====== crawling api usage of %s/%s ======' % (proj, api))
  
     query_result = { proj: {} }
     query_result[proj][api] = do_sg_query(api)

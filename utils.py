@@ -16,6 +16,9 @@ import datetime
 import tblib.pickling_support
 tblib.pickling_support.install()
 
+import logging
+logger = logging.getLogger(__name__)
+
 idxQs = []
 argQs = []
 
@@ -29,8 +32,8 @@ class ExceptionWrapper(object):
         __, __, self.tb = sys.exc_info()
 
     def re_raise(self):
-        print('The error thread info: %s' % (self.info))
-        print('The stack %s' % (self.ee))
+        logger.error('The error thread info: %s' % (self.info))
+        logger.error('The stack %s' % (self.ee))
         # for Python 2 use this
         #raise self.ee, None, self.tb
         # for Python 3 replace the previous line by:
@@ -69,7 +72,7 @@ def loop_wrapper_with_idx(wrapper_args):
 
     several_rslts = []
 
-    print('=== worker %s starts ===' % (idx))
+    logger.info('=== worker %s starts ===' % (idx))
 
     start = datetime.datetime.now()
 
@@ -87,7 +90,7 @@ def loop_wrapper_with_idx(wrapper_args):
         return [ ExceptionWrapper(e, interpret_xargs_func(idx, args)) ]
 
     end = datetime.datetime.now()
-    #print("process %d handled %d tasks, exec time is %.4f s" % (idx, len(several_rslts), (end - start).total_seconds()))
+    #logger.debug("process %d handled %d tasks, exec time is %.4f s" % (idx, len(several_rslts), (end - start).total_seconds()))
     return several_rslts
 
 def do_in_parallel_with_idx(do_func, all_args, rslt_handle, debug = False, para = None, sema = None, share_rslt=False, interpret_xargs_func=naive_interpret_func):
@@ -148,7 +151,7 @@ def do_in_parallel_with_idx(do_func, all_args, rslt_handle, debug = False, para 
 def test_do_func_with_idx(idx, args):
     if idx == 0:
         time.sleep(5)
-    print("idx %d args is %s" % (idx, args))
+    logger.info("idx %d args is %s" % (idx, args))
 
 def test_rslt_handle(rslt_list):
     return

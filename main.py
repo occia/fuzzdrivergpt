@@ -10,6 +10,9 @@ from prepareOSSFuzzImage import is_fuzzdrivergpt_image_exist, get_fuzzdrivergpt_
 
 import cfgs
 
+import logging
+logger = logging.getLogger(__name__)
+
 def iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, model, language, target, funcsig, improvestrategy, disablevalidation, outputjson):
 
 	# not use currently
@@ -24,27 +27,27 @@ def iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, mode
 		iterations += 1
 
 		# generate query
-		print('--- ROUND [%s] Iteration [%s]: generate query' % (rounds, iterations))
+		logger.info('--- ROUND [%s] Iteration [%s]: generate query' % (rounds, iterations))
 		query_record.generateNextQueries()
 
-		print('current generated queries are: %s' % (query_record.curQueryIDs))
+		logger.debug('current generated queries are: %s' % (query_record.curQueryIDs))
 		if len(query_record.curQueryIDs) == 0:
-			print('--- No more queries to generate, stop ---')
+			logger.info('--- No more queries to generate, stop ---')
 			break
 
 		# get response of query 
-		print('--- ROUND [%s] Iteration [%s]: get response' % (rounds, iterations))
+		logger.info('--- ROUND [%s] Iteration [%s]: get response' % (rounds, iterations))
 		query_record.doRemoteQuery()
 		if len(query_record.curQueryIDs) == 0:
-			print('--- No more queries to generate, stop ---')
+			logger.info('--- No more queries to generate, stop ---')
 			break
 
 		if disablevalidation:
-			print('--- Skip validation ---')
+			logger.info('--- Skip validation ---')
 			break
 
 		# validate the response
-		print('--- ROUND [%s] Iteration [%s]: validate response' % (rounds, iterations))
+		logger.info('--- ROUND [%s] Iteration [%s]: validate response' % (rounds, iterations))
 		query_record.doRemoteValidation()
 
 		if query_record.hasAcceptableResults():
@@ -54,10 +57,10 @@ def iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, mode
 			break
 
 	# find a valid response, record and end
-	print('=== Round [%s] finished ===' % (rounds))
-	print('All iteration results:')
+	logger.info('=== Round [%s] finished ===' % (rounds))
+	logger.debug('All iteration results:')
 	for qid in query_record.leafQueryIDs:
-		print('qid: %s' % (qid))
+		logger.debug('qid: %s' % (qid))
 		query_record.printIterationProcess(qid)
 
 	# dump per round result
@@ -93,24 +96,20 @@ def main_workflow(language, model, target, funcsig, querystrategy, disablevalida
 	while True:
 		rounds += 1
 
-		print('=== ROUND [%s] start ===' % (rounds))
+		logger.info('=== ROUND [%s] start ===' % (rounds))
 
 		query_record = iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, model, language, target, funcsig, improvestrategy, disablevalidation, outputjson)
 
 		if not disablevalidation:
 			if query_record.hasAcceptableResults():
-				print('=== ROUND [%s] has generated valid fuzz driver, exit ===' % (rounds))
+				logger.info('=== ROUND [%s] has generated valid fuzz driver, exit ===' % (rounds))
 				break
 
 		if rounds >= maxrounds:
-			print('=== Max rounds reached, exit ===')
+			logger.info('=== Max rounds reached, exit ===')
 			break
 
 def main():
-	if not cfgs.check_and_load_cfgs():
-		print('[ERROR] cfgs check failed, exit')
-		exit(1)
-
 	# parse args
 	parser = argparse.ArgumentParser(description='fuzzdrivergpt, a GPT-based fuzz driver generator.')
 	parser.add_argument('-l', '--language', required=True, choices=['c'], help='language')
@@ -136,28 +135,30 @@ def main():
 	maxrounds = args.maxrounds
 	outputjson = args.outputjson
 
+	if not cfgs.check_and_load_cfgs():
+		logger.error('cfgs check failed, exit')
+		exit(1)
+
 	# check args
 	if not outputjson.endswith('.json'):
-		print('output json must end with .json')
+		logger.error('output json must end with .json')
 		exit(1)
 
 	if disablevalidation:
 		if maxiterations != 1:
-			print('disablevalidation can only be set when maxiterations is 1')
+			logger.error('disablevalidation can only be set when maxiterations is 1')
 			exit(1)
 		elif maxrounds != 1:
-			print('disablevalidation can only be set when maxrounds is 1')
+			logger.error('disablevalidation can only be set when maxrounds is 1')
 			exit(1)
 		elif (querystrategy == 'ITER-BA') or (querystrategy == 'ITER-ALL'):
-			print('disablevalidation can only be set when querystrategy is not iterative')
+			logger.error('disablevalidation can only be set when querystrategy is not iterative')
 			exit(1)
 
 	if maxiterations != 1:
 		if (querystrategy != 'ITER-BA') and (querystrategy != 'ITER-ALL'):
-			print('maxiterations can only be set when querystrategy is iterative')
+			logger.error('maxiterations can only be set when querystrategy is iterative')
 			exit(1)
-
-	print('=== Running fuzzdrivergpt ===')
 
 	print('-' * 30)
 	print('Language:           %s' % (language))
@@ -171,13 +172,15 @@ def main():
 	print('Output Json:        %s' % (outputjson))
 	print('-' * 30)
 
+	logger.info('=== Running fuzzdrivergpt ===')
+
 	if os.path.exists(outputjson) and os.path.exists(outputjson.replace('.json', '.pickle')):
-		print('Output json already exists, will not continue')
+		logger.error('Output json already exists, will not continue')
 		exit(1)
 
 	if not is_fuzzdrivergpt_image_exist(target):
-		print("fuzzdrivergpt image '%s' does not exist, will not continue, please use the following command to build the image first (if it is a supported project):" % (get_fuzzdrivergpt_imgname(target)))
-		print('python prepareOSSFuzzImage.py -t fuzzdrivergpt-env %s' % (target))
+		logger.error("fuzzdrivergpt image '%s' does not exist, will not continue, please use the following command to build the image first (if it is a supported project):" % (get_fuzzdrivergpt_imgname(target)))
+		logger.error('python prepareOSSFuzzImage.py -t fuzzdrivergpt-env %s' % (target))
 		exit(1)
 	
 	main_workflow(language, model, target, funcsig, querystrategy, disablevalidation, maxiterations, maxrounds, outputjson)

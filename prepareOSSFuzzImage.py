@@ -6,6 +6,9 @@ from ipdb import launch_ipdb_on_exception
 
 import cfgs
 
+import logging
+logger = logging.getLogger(__name__)
+
 def validate_target_cfg(target):
 	tdir = '%s/%s' % (cfgs.FDGPT_OSSFUZZ_TARGETS, target)
 	tcfg = '%s/cfg.yml' % (tdir)
@@ -56,7 +59,7 @@ def build_image(client, target, imgname, volumes, command, message):
 
 	# run the container syncly
 	d = client.containers.run(baseimgname, command=command, volumes=volumes, environment=env, platform='amd64', shm_size='2g', remove=False, privileged=True, detach=True)
-	print(d.short_id)
+	logger.debug(d.short_id)
 	d.reload()
 	ret = d.wait()
 	if ret['Error'] != None or ret['StatusCode'] != 0:
@@ -113,11 +116,11 @@ def main():
 			if img != None:
 				if not force:
 					# exist, not force, we skip the build
-					print('=== skipping %s as image %s exists ===' % (target, imgname))
+					logger.info('=== skipping %s as image %s exists ===' % (target, imgname))
 					continue
 				else:
 					# exist & force, we remove the img
-					print('=== force mode, removing %s existing image %s ===' % (target, imgname))
+					logger.info('=== force mode, removing %s existing image %s ===' % (target, imgname))
 					client.images.remove(img.id)
 
 			baseimgname = get_base_imgname(target)
@@ -130,7 +133,7 @@ def main():
 		# for targets in list, build their images
 		for target in inlist_targets:
 			imgname = get_fuzzdrivergpt_imgname(target)
-			print('=== building image of %s -- %s ===' % (target, imgname))
+			logger.info('=== building image of %s -- %s ===' % (target, imgname))
 			build_fuzzdrivergpt_env_image(client, target)
 
 	elif imgtype == 'vanilla-ossfuzz':
@@ -143,11 +146,11 @@ def main():
 			if img != None:
 				if not force:
 					# exist, not force, we skip the build
-					print('=== skipping %s as image %s exists ===' % (target, imgname))
+					logger.info('=== skipping %s as image %s exists ===' % (target, imgname))
 					continue
 				else:
 					# exist & force, we remove the img
-					print('=== force mode, removing %s existing image %s ===' % (target, imgname))
+					logger.info('=== force mode, removing %s existing image %s ===' % (target, imgname))
 					client.images.remove(img.id)
 
 			baseimgname = get_base_imgname(target)
@@ -160,7 +163,7 @@ def main():
 		# for targets in list, build their images
 		for target in inlist_targets:
 			imgname = get_vanilla_ossfuzz_imgname(target)
-			print('=== building image of %s -- %s ===' % (target, imgname))
+			logger.info('=== building image of %s -- %s ===' % (target, imgname))
 			build_vanilla_ossfuzz_image(client, target)
 
 if __name__ == '__main__':

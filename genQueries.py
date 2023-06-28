@@ -16,6 +16,9 @@ from ipdb import launch_ipdb_on_exception
 
 import cfgs
 
+import logging
+logger = logging.getLogger(__name__)
+
 debug = False
 
 class ContainerAnalyzer(BaseAnalyzer):
@@ -36,7 +39,7 @@ class ContainerAnalyzer(BaseAnalyzer):
 
 			dockercmd = 'python3 /root/workspace/fuzzdrivergpt/libHeaderAnalyzer.py %s %s %s' % (self.cfg.headerpickle, querymode, self.cfg.headerparampickle)
 			if debug:
-				print(dockercmd)
+				logger.info(dockercmd)
 				dockercmd = 'sleep 10h'
 			imagename = self.cfg.imagename
 			dockervolumns = [
@@ -81,23 +84,23 @@ class ContainerAnalyzer(BaseAnalyzer):
 				self.docker = client.containers.run(imagename, command=dockercmd, volumes=dockervolumns, working_dir=workdir, privileged=True, remove=False, detach=True)
 
 			except Exception as ex:
-				print('meet exception when run docker %s' % (ex))
+				logger.error('meet exception when run docker %s' % (ex))
 				raise ex
 
 			if debug:
-				print('docker exec -it %s bash' % (self.docker.name))
+				logger.error('docker exec -it %s bash' % (self.docker.name))
 				os._exit(0)
 
 			self.docker.reload()
 			rets = self.docker.wait()
 			if rets['StatusCode'] != 0:
-				print('>> Container does not start as expected, check the logs inside the docker:\n\n%s\n' % (self.docker.logs().decode('utf-8', errors='ignore')))
-				print('>> Stack track outside container:')
+				logger.error('>> Container does not start as expected, check the logs inside the docker:\n\n%s\n' % (self.docker.logs().decode('utf-8', errors='ignore')))
+				logger.error('>> Stack track outside container:')
 				raise Exception('starting container meets error')
 			
 			self.docker.remove(force=True)
 
-			print('[+] query file %s has been created' % (self.cfg.queryfile))
+			logger.debug('query file %s has been created' % (self.cfg.queryfile))
 		else:
 			raise Exception('Unsupported language %s' % (self.cfg.language))
 
@@ -145,7 +148,7 @@ def main():
 
 	workflow = args.workflow
 	if workflow is None:
-		print('please specify workflow')
+		logger.error('please specify workflow')
 		parser.print_help()
 		exit(1)
 
@@ -181,9 +184,9 @@ def main():
 		with open(analyzer.cfg.queryfile, 'r') as f:
 			queries = json.load(f)
 			for idx in range(len(queries)):
-				print('-' * 12 + ' Query %s ' % (idx + 1) + '-' * 12)
-				print(queries[idx])
-				print('\n')
+				logger.info('-' * 12 + ' Query %s ' % (idx + 1) + '-' * 12)
+				logger.info(queries[idx])
+				logger.info('\n')
 
 	elif workflow == 'listimprove':
 		validatedfile = args.validatedfile
@@ -254,7 +257,7 @@ def main():
 		# main logic
 		queries = []
 
-		print('=== handling %s ===' % (target))
+		logger.info('=== handling %s ===' % (target))
 
 		analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
 		analyzer.analyze_wrap(querymode, {'toChatGpt': to_chatgpt, 'funcsig': funcsig})

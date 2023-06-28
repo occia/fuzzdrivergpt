@@ -20,6 +20,9 @@ from ipdb import launch_ipdb_on_exception
 
 import cfgs
 
+import logging
+logger = logging.getLogger(__name__)
+
 docker_client = docker.from_env()
 g_task_id = ''
 
@@ -29,12 +32,12 @@ def docker_wait_and_kill(lock, docker_ref, remove):
 			docker_ref.reload()
 		rets = docker_ref.wait(timeout=120)
 		if rets['StatusCode'] != 0:
-			print('container does not start as expected, check the logs:\n%s' % (docker_ref.logs()))
+			logger.warning('container does not start as expected, check the logs:\n%s' % (docker_ref.logs()))
 			raise Exception('starting container meets error')
 
 	except Exception as ex:
 		# sometimes the fuzzer will stuck, we kill it after passing a safe & long time period
-		#print('jump out when timeout, we will kill it soon')
+		#logger.error('jump out when timeout, we will kill it soon')
 		docker_ref.kill()
 
 	finally:
@@ -42,8 +45,8 @@ def docker_wait_and_kill(lock, docker_ref, remove):
 			with lock:
 				docker_ref.remove(force=True)
 
-	#print('[1] status: %s' % (docker_ref.status))
-	#print('[2] status: %s' % (docker_client.containers.list(all=True, filters={'id':docker_ref.id})[0].status))
+	#logger.debug('[1] status: %s' % (docker_ref.status))
+	#logger.debug('[2] status: %s' % (docker_client.containers.list(all=True, filters={'id':docker_ref.id})[0].status))
 
 class ContainerValidator(BaseValidator):
 
@@ -59,7 +62,7 @@ class ContainerValidator(BaseValidator):
 					self.docker.remove(force=True)
 			except Exception as e:
 				# it is okay to eat errors of remove here
-				#print('meet exception when kill docker: %s' % (e))
+				#logger.debug('meet exception when kill docker: %s' % (e))
 				pass
 			finally:
 				self.docker = None
@@ -105,7 +108,7 @@ class ContainerValidator(BaseValidator):
 		TargetCfg.pickleTo(self.cfg, self.cfg.validatepickle)
 		dockercmd = 'python3 /root/workspace/fuzzdrivergpt/libValidator.py %s %s %s %s %s' % (self.cfg.validatepickle, vid, fuzz, check_fuzz_fns, sema)
 		if debug:
-			print(dockercmd)
+			logger.debug(dockercmd)
 			dockercmd = 'sleep 50h'
 		imagename = self.cfg.imagename
 		dockervolumns = [ 
@@ -130,9 +133,9 @@ class ContainerValidator(BaseValidator):
 		]
 		workdir = self.cfg.workdir
 
-		#print('workdir is %s' % (self.cfg.workdir))
-		#print('outfile is %s' % (self.cfg.outfile))
-		#print('query_result is %s' % (query_result))
+		#logger.debug('workdir is %s' % (self.cfg.workdir))
+		#logger.debug('outfile is %s' % (self.cfg.outfile))
+		#logger.debug('query_result is %s' % (query_result))
 
 		self.update_code(query_result)
 
@@ -144,12 +147,12 @@ class ContainerValidator(BaseValidator):
 				self.docker.reload()
 
 		except Exception as ex:
-			print('meet exception when run docker %s' % (ex))
+			logger.error('meet exception when run docker %s' % (ex))
 			raise ex
 
-		#print('docker logs %s' % (self.docker.logs()))
+		#logger.debug('docker logs %s' % (self.docker.logs()))
 		if debug:
-			print('docker exec -it %s bash' % (self.docker.name))
+			logger.debug('docker exec -it %s bash' % (self.docker.name))
 			os._exit(0)
 
 		if sync:
@@ -180,7 +183,7 @@ def validate_do_func(task_idx, lock, args):
 	ridx, sidxs = args[0], args[1]
 	rslt = rslts[ridx]
 
-	print('[-] handling query id %s with solutions %s' % (rslt['id'], sidxs))
+	logger.info('[-] handling query id %s with solutions %s' % (rslt['id'], sidxs))
 
 	qid = rslt['id']
 	query = rslt['query']
@@ -194,14 +197,14 @@ def validate_do_func(task_idx, lock, args):
 	if 'check_fuzz_fns' in rslt:
 		check_fuzz_fns = rslt['check_fuzz_fns']
 
-	#print('lock %s' % (lock))
+	#logger.debug('lock %s' % (lock))
 	validator = ContainerValidator(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target, task_idx=('%s%s' % (g_task_id, task_idx))), lock)
 
 	vali_rslt = {}
 
 	for sidx in sidxs:
-		#print('[-] solution %s' % (sidx))
-		print('[-] handling query id %s solution %s' % (rslt['id'], sidx))
+		#logger.debug('[-] solution %s' % (sidx))
+		logger.debug('[-] handling query id %s solution %s' % (rslt['id'], sidx))
 
 		solution = rslt['result']['solutions'][sidx]
 
@@ -217,7 +220,7 @@ def validate_do_func(task_idx, lock, args):
 
 		vali_rslt[(ridx, sidx)] = validation
 
-	#print('[-] finish handling query id %s' % (rslt['id']))
+	#logger.debug('[-] finish handling query id %s' % (rslt['id']))
 	return vali_rslt
 
 def run_cmdline_validation(querylist, scope, apipattern, idxpattern, valinumperdocker, debug, sequential, para, dockerpara, idxset=None):
@@ -234,12 +237,12 @@ def run_cmdline_validation(querylist, scope, apipattern, idxpattern, valinumperd
 		if re.search(apipattern, rslts[ridx]['id']) != None:
 			if 'ValidateMarkedOnly' in rslts[ridx]:
 				if rslts[ridx]['ValidateMarkedOnly'] != 'Marked':
-					print('[INFO] %s requires validate marked only with "%s", skip its validation' % (rslts[ridx]['id'], rslts[ridx]['ValidateMarkedOnly']))
+					logger.debug('%s requires validate marked only with "%s", skip its validation' % (rslts[ridx]['id'], rslts[ridx]['ValidateMarkedOnly']))
 					continue
 
-			print('[INFO] %s is in scope' % (rslts[ridx]['id']))
+			logger.debug('%s is in scope' % (rslts[ridx]['id']))
 			if 'solutions' not in rslts[ridx]['result']:
-				print('[WARN] %s does not have solutions' % (rslts[ridx]['id']))
+				logger.warning('%s does not have solutions' % (rslts[ridx]['id']))
 				rslts[ridx]['result']['solutions'] = []
 
 			all_queries.append(ridx)
@@ -258,10 +261,10 @@ def run_cmdline_validation(querylist, scope, apipattern, idxpattern, valinumperd
 					all_args.append( (ridx, sidxlist[start:stop]) )
 
 	if debug and len(all_queries) > 1:
-		print('In debug mode, only one query should be specified')
+		logger.error('In debug mode, only one query should be specified')
 		exit(1)
 
-	print('In scope %s with pattern `%s`, there are %s tasks, %s solutions' % (scope, apipattern, len(all_queries), len(all_args)))
+	logger.info('In scope %s with pattern `%s`, there are %s tasks, %s solutions' % (scope, apipattern, len(all_queries), len(all_args)))
 
 	def rslt_handle(validated_rslts):
 		global rslts
@@ -347,7 +350,7 @@ def run_server_mode(ip, port, para, dockerpara, projectpara, valinumperdocker):
 	@app.route('/validate', methods=["POST"])
 	@auth.login_required
 	def validate():
-		print("add new validation task")
+		logger.debug("add new validation task")
 		if request.method == "POST":
 			received_data = request.get_json()
 
@@ -372,7 +375,7 @@ def run_server_mode(ip, port, para, dockerpara, projectpara, valinumperdocker):
 	@app.route('/full_status', methods=["GET"])
 	@auth.login_required
 	def fullstatus():
-		print("dump all task statuses")
+		logger.debug("dump all task statuses")
 		if request.method == "GET":
 			full_status = None
 			with taskLock:
@@ -383,7 +386,7 @@ def run_server_mode(ip, port, para, dockerpara, projectpara, valinumperdocker):
 	@app.route('/status', methods=["POST"])
 	@auth.login_required
 	def status():
-		print("check task")
+		logger.debug("check task")
 		if request.method == "POST":
 			received_data = request.get_json()
 			taskid = received_data['taskid']
@@ -405,7 +408,7 @@ def run_server_mode(ip, port, para, dockerpara, projectpara, valinumperdocker):
 				taskid = item['taskid']
 				inputjson = item['inputjson']
 				outputjson = item['outputjson']
-				print('[+] handling task %s with input %s output %s' % (taskid, inputjson, outputjson))
+				logger.info('handling task %s with input %s output %s' % (taskid, inputjson, outputjson))
 
 				# update the task status
 				with taskLock:
@@ -429,13 +432,13 @@ def run_server_mode(ip, port, para, dockerpara, projectpara, valinumperdocker):
 				for i in range(0, len(proj_list), projectpara):
 					vali_projs_list.append( proj_list[i: i+projectpara] )
 				
-				print('[+] %s projects will be validated in %s groups' % (len(proj_list), len(vali_projs_list)))
+				logger.info('%s projects will be validated in %s groups' % (len(proj_list), len(vali_projs_list)))
 
 				dict_rslts = {}
 
 				for vali_projs in vali_projs_list:
 					## - load the docker image
-					#print(' [-] loading images of %s' % (vali_projs))
+					#logger.info('loading images of %s' % (vali_projs))
 					#for proj in vali_projs:
 					#	with open('/root/workspace/dockerenv/images/fuzzdrivergpt/%s_env' % (proj), 'rb') as f:
 					#		docker_client.images.load(f.read(-1))
@@ -445,7 +448,7 @@ def run_server_mode(ip, port, para, dockerpara, projectpara, valinumperdocker):
 					for proj in vali_projs:
 						idxset |= proj2idxs[proj]
 
-					print(' [-] validating %s' % (vali_projs))
+					logger.info('validating %s' % (vali_projs))
 					outobj = run_cmdline_validation(querylist, taskid, '.*', '.*', valinumperdocker, False, False, para, dockerpara, idxset=idxset)
 
 					# - save the results
@@ -453,7 +456,7 @@ def run_server_mode(ip, port, para, dockerpara, projectpara, valinumperdocker):
 						dict_rslts[rslt['id']] = rslt
 
 					## - remove the docker image
-					#print(' [-] removing images of %s' % (vali_projs))
+					#logger.info('removing images of %s' % (vali_projs))
 					#for proj in vali_projs:
 					#	docker_client.images.remove('fuzzdrivergpt/%s:env' % (proj))
 
@@ -464,18 +467,18 @@ def run_server_mode(ip, port, para, dockerpara, projectpara, valinumperdocker):
 				with taskLock:
 					task_statuses[taskid] = 'done'
 			except Exception as e:
-				print('[+] task %s meets err: %s' % (taskid, str(e)))
-				print('\n'.join(traceback.format_exception(type(e), e, e.__traceback__)))
+				logger.error('task %s meets err: %s' % (taskid, str(e)))
+				logger.error('\n'.join(traceback.format_exception(type(e), e, e.__traceback__)))
 				with taskLock:
 					task_statuses[taskid] = 'err-%s' % (str(e))
 
-			print('[+] task %s is done' % (taskid))
+			logger.info('task %s is done' % (taskid))
 			Q.task_done()
 
 	mainloop = threading.Thread(target=main_task_loop)
 	mainloop.start()
 
-	print('=== start running HTTP server ===')
+	logger.info('=== start running HTTP server ===')
 	app.run(ip, port, ssl_context=ssl_context)
 
 def main():
@@ -535,30 +538,30 @@ def main():
 
 	if servermode: 
 		if debug or sequential:
-			print('server mode does not support debug or sequential mode')
+			logger.error('server mode does not support debug or sequential mode')
 			exit(1)
 	else:
 		if inputjson == None:
-			print('input json file is required')
+			logger.error('input json file is required')
 			exit(1)
 
-	print('inputjson: %s' % (inputjson))
-	print('taskid: %s' % (taskid))
-	print('scope: %s' % (scope))
-	print('apipattern: %s' % (apipattern))
-	print('idxpattern: %s' % (idxpattern))
-	print('debug mode: %s' % ('on' if debug else 'off'))
-	print('sequential mode: %s' % ('on' if sequential else 'off'))
-	print('server mode: %s' % ('on' if servermode else 'off'))
+	logger.info('inputjson: %s' % (inputjson))
+	logger.info('taskid: %s' % (taskid))
+	logger.info('scope: %s' % (scope))
+	logger.info('apipattern: %s' % (apipattern))
+	logger.info('idxpattern: %s' % (idxpattern))
+	logger.info('debug mode: %s' % ('on' if debug else 'off'))
+	logger.info('sequential mode: %s' % ('on' if sequential else 'off'))
+	logger.info('server mode: %s' % ('on' if servermode else 'off'))
 	if servermode:
-		print('server ip: %s' % (ip))
-		print('server port: %s' % (port))
-	print('parallel number if not sequential: %s' % ('ncpu' if para == 0 else para))
-	print('maximum concurrent number of docker API request: %s' % ('ncpu' if dockerpara == 0 else dockerpara))
-	print('validation number per docker: %s' % (valinumperdocker))
-	print('maximum concurrent number of projects being validated: %s' % (projectpara))
+		logger.info('server ip: %s' % (ip))
+		logger.info('server port: %s' % (port))
+	logger.info('parallel number if not sequential: %s' % ('ncpu' if para == 0 else para))
+	logger.info('maximum concurrent number of docker API request: %s' % ('ncpu' if dockerpara == 0 else dockerpara))
+	logger.info('validation number per docker: %s' % (valinumperdocker))
+	logger.info('maximum concurrent number of projects being validated: %s' % (projectpara))
 	if outfile != '':
-		print('output file: %s' % (outfile))
+		logger.info('output file: %s' % (outfile))
 
 	#
 	# main logic

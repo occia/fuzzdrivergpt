@@ -6,6 +6,9 @@ import openai
 
 import cfgs
 
+import logging
+logger = logging.getLogger(__name__)
+
 tokenizer = None
 
 '''
@@ -36,7 +39,7 @@ def doquery(model, query, key, orgid):
 			err = str(e)
 
 			if 'reduce your prompt' in err:
-				print(err)
+				logger.warning(err)
 				matches = re.search(token_err_ptrn, err)
 
 				if matches == None:
@@ -58,7 +61,7 @@ def doquery(model, query, key, orgid):
 				continue
 
 			else:
-				print(err)
+				logger.warning(err)
 				time.sleep(10)
 				continue
 
@@ -68,7 +71,7 @@ def doquery(model, query, key, orgid):
 		rslt = {'status':'FinishedNormally'}
 		#rslt['solutions'] = [ choice['text'] for choice in resp['choices'] ]
 		rslt['solutions'] = [ choice['message']['content'] for choice in resp['choices'] ]
-		print('get %s resp solutions: %s' % (len(rslt['solutions']), rslt['solutions']))
+		logger.debug('get %s resp solutions: %s' % (len(rslt['solutions']), rslt['solutions']))
 		return rslt
 
 def init_tokenizer():
@@ -94,15 +97,15 @@ def token_length_exceeded(model, query):
 	elif 'gpt-4' in model:
 		# leave at least 500 tokens for answer
 		return token_num - 6000
-		#print('--- query failed by long token num %s, not retry' % (token_num))
+		#logger.warning('--- query failed by long token num %s, not retry' % (token_num))
 	else:
 		raise Exception('Not implemented yet')
 
 def shrink_query_usage_if_can(model, query):
-	#print('before shrink: \n%s' % query)
+	#logger.debug('before shrink: \n%s' % query)
 
 	if token_length_exceeded(model, query) <= 0:
-		print('no need to shrink')
+		logger.debug('no need to shrink')
 		return query
 
 	# identify usage part
@@ -116,27 +119,27 @@ def shrink_query_usage_if_can(model, query):
 			break
 	
 	if startidx == None or endidx == None or startidx >= endidx:
-		print('failed to shrink since there is no usage part')
+		logger.debug('failed to shrink since there is no usage part')
 		return query
 	
 	for idx in range(endidx, startidx - 1, -1):
 		new_query = '\n'.join(lines[:idx] + lines[endidx:])
 		if token_length_exceeded(model, new_query) <= 0:
-			print('shrinked from %s to %s' % (len(query), len(new_query)))
-			print('=======')
-			print('before shrink: \n%s' % (query))
-			print('=======')
-			print('after shrink: \n%s' % (new_query))
-			print('=======')
+			logger.debug('shrinked from %s to %s' % (len(query), len(new_query)))
+			logger.debug('=======')
+			logger.debug('before shrink: \n%s' % (query))
+			logger.debug('=======')
+			logger.debug('after shrink: \n%s' % (new_query))
+			logger.debug('=======')
 			return new_query
 	
-	print('failed to shrink to the expected size, startidx %s, endidx %s' % (startidx, endidx))
+	logger.debug('failed to shrink to the expected size, startidx %s, endidx %s' % (startidx, endidx))
 	return query
 
 def resilient_wrapper_query(model, query):
 	# token length check
 	if token_length_exceeded(model, query) > 0:
-		print('--- query failed by query exceeded maximum length')
+		logger.debug('--- query failed by query exceeded maximum length')
 		return { 'status': 'ERRLONGQUERY', 'solutions': [ ] }
 
 	return doquery(model, query, cfgs.FDGPT_OPENAI_APIKEY, cfgs.FDGPT_OPENAI_ORGID)
