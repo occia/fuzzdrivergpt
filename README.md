@@ -28,43 +28,15 @@ The following demo shows the process of using iterative query strategy to genera
 
 ## Prerequisites
 
-- get your [openai api key](https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key), and configure it into the `openaikey.txt` (it is ignored by git)
-
-```bash
-# content of openaikey.txt
-OPENAI_APIKEY = your-openai-apikey
-OPENAI_ORGID = your-orgid
-```
 - install `docker`, [docker install steps](https://docs.docker.com/desktop/install/linux-install/)
 
-- install `jdk-19.0.2` into `./tools/jdk-19.0.2`
+- get your [openai api key](https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key)
+
+- run `install-pre.sh`
 
 ```bash
-wget https://download.java.net/java/GA/jdk19.0.2/fdb695a9d9064ad6b064dc6df578380c/7/GPL/openjdk-19.0.2_linux-x64_bin.tar.gz
-tar xf openjdk-19.0.2_linux-x64_bin.tar.gz
-mv jdk-19.0.2 tools/
-# remove the download if you want
-rm openjdk-19.0.2_linux-x64_bin.tar.gz
+bash install-pre.sh YOUR-OPENAI-KEY YOUR-OPENAI-ORGID
 ```
-
-- install python requirements
-
-```bash
-# one-time installation
-mkdir venv
-virtualenv -p `which python3` venv
-. venv/bin/activate
-pip install -r requirements.txt
-deactivate
-
-# enter the python env 
-. venv/bin/activate
-# leave the python env 
-deactivate
-```
-
-- (Optional) install `src-cli` from [SourceGraph doc](https://github.com/sourcegraph/src-cli#installation-linux)
-
 
 ## Usage 
 
