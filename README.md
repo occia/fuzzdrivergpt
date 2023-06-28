@@ -28,15 +28,19 @@ The following demo shows the process of using iterative query strategy to genera
 
 ## Prerequisites
 
-- install `docker`, [docker install steps](https://docs.docker.com/desktop/install/linux-install/)
+- python 3, [python 3.8 is recommended](https://docs.python-guide.org/starting/install3/linux/)
 
-- get your [openai api key](https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key)
+- docker, [docker latest install steps](https://docs.docker.com/desktop/install/linux-install/)
+
+- [openai api key](https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key)
 
 - run `install-pre.sh`
 
 ```bash
 bash install-pre.sh YOUR-OPENAI-KEY YOUR-OPENAI-ORGID
 ```
+
+After finish the above, use `. venv/bin/activate` to enter the python environment for running `fuzzdrivergpt`.
 
 ## Usage 
 
