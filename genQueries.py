@@ -1,16 +1,9 @@
-import os
 import copy
 import json
-import time
-import utils
-import docker
-import pickle
 import argparse
-import threading
-import traceback
 
 from libTarget import TargetCfg
-from apiusage.libHeaderAnalyzer import BaseAnalyzer
+from apiusage.libContainerWrapper import ContainerAnalyzer
 
 from ipdb import launch_ipdb_on_exception
 
@@ -20,87 +13,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 debug = False
-
-class ContainerAnalyzer(BaseAnalyzer):
-
-	def __init__(self, cfg):
-		super().__init__(cfg)
-		if not os.path.exists(self.cfg.workdir):
-			os.makedirs(self.cfg.workdir, exist_ok=True)
-		self.docker = None
-
-	def analyze_wrap(self, querymode, params):
-		global debug
-
-		if self.cfg.language == 'c':
-			TargetCfg.pickleTo(self.cfg, self.cfg.headerpickle)
-			with open(self.cfg.headerparampickle, 'wb') as f:
-				pickle.dump(params, f)
-			#print('@@params are %s' % (str(params)))
-
-			dockercmd = 'python3 /root/workspace/fuzzdrivergpt/apiusage/libHeaderAnalyzer.py %s %s %s' % (self.cfg.headerpickle, querymode, self.cfg.headerparampickle)
-			if debug:
-				logger.info(dockercmd)
-				dockercmd = 'sleep 10h'
-
-			imagename = self.cfg.imagename
-
-			envs = [
-				"PYTHONPATH=/root/workspace/fuzzdrivergpt",
-			]
-
-			dockervolumns = [
-				'%s:%s' % (self.cfg.workdir, self.cfg.workdir),
-				'%s:%s' % (self.cfg.cachedir, self.cfg.cachedir),
-				'%s/libTarget.py:/root/workspace/fuzzdrivergpt/libTarget.py' % (cfgs.FDGPT_DIR),
-				'%s/apiusage/__init__.py:/root/workspace/fuzzdrivergpt/apiusage/__init__.py' % (cfgs.FDGPT_DIR),
-				'%s/apiusage/libHeaderAnalyzer.py:/root/workspace/fuzzdrivergpt/apiusage/libHeaderAnalyzer.py' % (cfgs.FDGPT_DIR),
-				'%s/apiusage/libManualAPIDoc.py:/root/workspace/fuzzdrivergpt/apiusage/libManualAPIDoc.py' % (cfgs.FDGPT_DIR),
-				'%s/generation/__init__.py:/root/workspace/fuzzdrivergpt/generation/__init__.py' % (cfgs.FDGPT_DIR),
-				'%s/generation/libImproveQueryGen.py:/root/workspace/fuzzdrivergpt/generation/libImproveQueryGen.py' % (cfgs.FDGPT_DIR),
-				'%s/validation/__init__.py:/root/workspace/fuzzdrivergpt/validation/__init__.py' % (cfgs.FDGPT_DIR),
-				'%s/validation/libVR.py:/root/workspace/fuzzdrivergpt/validation/libVR.py' % (cfgs.FDGPT_DIR),
-				'%s/cfgs.py:/root/workspace/fuzzdrivergpt/cfgs.py' % (cfgs.FDGPT_DIR),
-			]
-
-			if querymode == 'UGCTX' or querymode == 'SGUGCTX' or querymode == 'ALLUGCTX' or querymode == 'IMPROVE':
-				if os.path.exists(cfgs.FDGPT_JDK):
-					dockervolumns.append("%s:/root/workspace/fuzzdrivergpt/jdk-19.0.2" % (cfgs.FDGPT_JDK))
-
-				dockervolumns.append("%s:/tmp/cc-func-parser-0.5-jar-with-dependencies.jar" % (cfgs.FDGPT_ANTLR))
-
-				if querymode == 'SGUGCTX' or querymode == 'ALLUGCTX' or querymode == 'IMPROVE':
-					dockervolumns.append('%s:%s' % (cfgs.FDGPT_CRAWLED_USAGE, self.cfg.sgusagejson))
-
-			workdir = self.cfg.workdir
-			#print('@@@ the working dir is %s' % (self.cfg.workdir))
-
-			# run the docker
-			client = docker.from_env()
-
-			try:
-				self.docker = client.containers.run(imagename, environment=envs, command=dockercmd, volumes=dockervolumns, working_dir=workdir, privileged=True, remove=False, detach=True)
-
-			except Exception as ex:
-				logger.error('meet exception when run docker %s' % (ex))
-				raise ex
-
-			if debug:
-				logger.error('docker exec -it %s bash' % (self.docker.name))
-				os._exit(0)
-
-			self.docker.reload()
-			rets = self.docker.wait()
-			if rets['StatusCode'] != 0:
-				logger.error('>> Container does not start as expected, check the logs inside the docker:\n\n%s\n' % (self.docker.logs().decode('utf-8', errors='ignore')))
-				logger.error('>> Stack track outside container:')
-				raise Exception('starting container meets error')
-			
-			self.docker.remove(force=True)
-
-			logger.debug('query file %s has been created' % (self.cfg.queryfile))
-		else:
-			raise Exception('Unsupported language %s' % (self.cfg.language))
 
 def main():
 	global debug
@@ -251,7 +163,7 @@ def main():
 		logger.info('=== handling %s ===' % (target))
 
 		analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
-		analyzer.analyze_wrap(querymode, {'toChatGpt': to_chatgpt, 'funcsig': funcsig})
+		analyzer.analyze_wrap({'toChatGpt': to_chatgpt, 'funcsig': funcsig}, debug=debug)
 
 		## dump queries to json
 		#with open(outfile, 'w') as f:

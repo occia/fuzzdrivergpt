@@ -70,7 +70,8 @@ class TargetCfg:
 
 		self.headerpickle = os.path.join(self.workdir, 'header.pickle')
 		self.headerparampickle = os.path.join(self.workdir, 'headerparam.pickle')
-		self.queryfile = os.path.join(self.workdir, 'input_queries.json')
+		self.projanaresult = os.path.join(self.workdir, 'proj_analyzer_result.json')
+		self.sgusagejson = os.path.join(self.workdir, 'sgusage.json')
 
 		self.apicachepickle = os.path.join(self.cachedir, 'apicache.pickle')
 
@@ -99,7 +100,6 @@ class TargetCfg:
 		self.runcmd_subprocess = [ "bash", "-x", "/tmp/fuzz.sh" ]
 
 		self.testcase = os.path.join(self.workdir, 'testcase')
-		self.sgusagejson = os.path.join(self.workdir, 'sgusage.json')
 		self.testexe = os.path.join(self.workdir, 'dummytester')
 		self.testlog = os.path.join(self.workdir, 'test.log')
 		self.testbuildcmd = self.cfgs['build'].replace('COMPBASE' ,' '.join(self.compileopts)).replace('OUTFILE', self.testfile).replace('OUTEXE', self.testexe).replace('-fsanitize=fuzzer-no-link', '').replace('-fsanitize=fuzzer', '')
