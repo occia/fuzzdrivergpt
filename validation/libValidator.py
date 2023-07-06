@@ -7,10 +7,10 @@ import subprocess
 
 import clang.cindex
 
-import libVR
 from libTarget import TargetCfg
 
-import libSemanticChecker
+from validation import libSemanticChecker
+from validation import libVR
 
 class BaseValidator:
 

@@ -12,11 +12,12 @@ import requests
 import argparse
 
 import cfgs
-import libVR
-import libQuery
 import libTarget
 import genQueries
-import handleChatGPTResult
+
+from validation import libVR
+from generation import libQuery
+from generation import handleChatGPTResult
 
 import logging
 logger = logging.getLogger(__name__)

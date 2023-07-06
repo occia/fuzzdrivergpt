@@ -14,7 +14,7 @@ import queue
 import threading
 
 from libTarget import TargetCfg
-from libValidator import BaseValidator
+from validation.libValidator import BaseValidator
 
 from ipdb import launch_ipdb_on_exception
 
@@ -106,21 +106,21 @@ class ContainerValidator(BaseValidator):
 
 		# prepare & start a docker
 		TargetCfg.pickleTo(self.cfg, self.cfg.validatepickle)
-		dockercmd = 'python3 /root/workspace/fuzzdrivergpt/libValidator.py %s %s %s %s %s' % (self.cfg.validatepickle, vid, fuzz, check_fuzz_fns, sema)
+		dockercmd = 'python3 /root/workspace/fuzzdrivergpt/validation/libValidator.py %s %s %s %s %s' % (self.cfg.validatepickle, vid, fuzz, check_fuzz_fns, sema)
 		if debug:
 			logger.debug(dockercmd)
 			dockercmd = 'sleep 50h'
 		imagename = self.cfg.imagename
 		dockervolumns = [ 
-			#'%s/targets/%s:/root/workspace/fuzzdrivergpt/install' % (cfgs.FDGPT_DIR, self.cfg.target),
 			'%s:%s' % (self.cfg.workdir, self.cfg.workdir),
 			'%s:%s' % (self.cfg.cachedir, self.cfg.cachedir),
 			'%s/libTarget.py:/root/workspace/fuzzdrivergpt/libTarget.py' % (cfgs.FDGPT_DIR),
-			'%s/libVR.py:/root/workspace/fuzzdrivergpt/libVR.py' % (cfgs.FDGPT_DIR),
-			'%s/libValidator.py:/root/workspace/fuzzdrivergpt/libValidator.py' % (cfgs.FDGPT_DIR),
-			'%s/libSemanticChecker.py:/root/workspace/fuzzdrivergpt/libSemanticChecker.py' % (cfgs.FDGPT_DIR),
-			'%s/meta/benchapidata.json:/root/workspace/fuzzdrivergpt/meta/benchapidata.json' % (cfgs.FDGPT_DIR),
 			'%s/cfgs.py:/root/workspace/fuzzdrivergpt/cfgs.py' % (cfgs.FDGPT_DIR),
+			'%s/validation/__init__.py:/root/workspace/fuzzdrivergpt/validation/__init__.py' % (cfgs.FDGPT_DIR),
+			'%s/validation/libVR.py:/root/workspace/fuzzdrivergpt/validation/libVR.py' % (cfgs.FDGPT_DIR),
+			'%s/validation/libValidator.py:/root/workspace/fuzzdrivergpt/validation/libValidator.py' % (cfgs.FDGPT_DIR),
+			'%s/validation/libSemanticChecker.py:/root/workspace/fuzzdrivergpt/validation/libSemanticChecker.py' % (cfgs.FDGPT_DIR),
+			'%s/meta/benchapidata.json:/root/workspace/fuzzdrivergpt/meta/benchapidata.json' % (cfgs.FDGPT_DIR),
 		]
 		env = [
 			'FUZZING_ENGINE=libfuzzer',
@@ -128,6 +128,7 @@ class ContainerValidator(BaseValidator):
 			'ARCHITECTURE=x86_64',
 			'PROJECT_NAME=%s' % (self.cfg.target),
 			'HELPER=True',
+			'PYTHONPATH=/root/workspace/fuzzdrivergpt',
 			# TODO: language should be parameterized
 			'FUZZING_LANGUAGE=c',
 		]
@@ -142,7 +143,7 @@ class ContainerValidator(BaseValidator):
 		# run a docker
 		try:
 			with self.lock:
-				self.docker = docker_client.containers.run(imagename, command=dockercmd, volumes=dockervolumns, working_dir=workdir, privileged=True, remove=False, detach=True, network_mode='none')
+				self.docker = docker_client.containers.run(imagename, environment=env, command=dockercmd, volumes=dockervolumns, working_dir=workdir, privileged=True, remove=False, detach=True, network_mode='none')
 				#self.docker = docker_client.containers.run(imagename, command=dockercmd, volumes=dockervolumns, working_dir=workdir, privileged=True, remove=False, detach=True)
 				self.docker.reload()
 

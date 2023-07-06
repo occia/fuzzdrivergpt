@@ -2,9 +2,9 @@ import os
 import pickle
 import argparse
 
-import libQuery
+from generation import libQuery
+from generation.libIterative import IterativeQueryRecord
 from libTarget import TargetCfg
-from libIterative import IterativeQueryRecord
 
 from prepareOSSFuzzImage import is_fuzzdrivergpt_image_exist, get_fuzzdrivergpt_imgname
 

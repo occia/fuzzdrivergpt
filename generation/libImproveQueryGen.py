@@ -1,9 +1,7 @@
 import os
 import random
 
-#import clang.cindex
-
-import libVR
+from validation import libVR
 
 '''
 Testing commands:

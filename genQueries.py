@@ -10,7 +10,7 @@ import threading
 import traceback
 
 from libTarget import TargetCfg
-from libHeaderAnalyzer import BaseAnalyzer
+from apiusage.libHeaderAnalyzer import BaseAnalyzer
 
 from ipdb import launch_ipdb_on_exception
 
@@ -36,25 +36,34 @@ class ContainerAnalyzer(BaseAnalyzer):
 			TargetCfg.pickleTo(self.cfg, self.cfg.headerpickle)
 			with open(self.cfg.headerparampickle, 'wb') as f:
 				pickle.dump(params, f)
+			#print('@@params are %s' % (str(params)))
 
-			dockercmd = 'python3 /root/workspace/fuzzdrivergpt/libHeaderAnalyzer.py %s %s %s' % (self.cfg.headerpickle, querymode, self.cfg.headerparampickle)
+			dockercmd = 'python3 /root/workspace/fuzzdrivergpt/apiusage/libHeaderAnalyzer.py %s %s %s' % (self.cfg.headerpickle, querymode, self.cfg.headerparampickle)
 			if debug:
 				logger.info(dockercmd)
 				dockercmd = 'sleep 10h'
+
 			imagename = self.cfg.imagename
+
+			envs = [
+				"PYTHONPATH=/root/workspace/fuzzdrivergpt",
+			]
+
 			dockervolumns = [
-				#'%s/targets/%s:/root/workspace/fuzzdrivergpt/install' % (cfgs.FDGPT_DIR, self.cfg.target),
 				'%s:%s' % (self.cfg.workdir, self.cfg.workdir),
 				'%s:%s' % (self.cfg.cachedir, self.cfg.cachedir),
 				'%s/libTarget.py:/root/workspace/fuzzdrivergpt/libTarget.py' % (cfgs.FDGPT_DIR),
-				'%s/libHeaderAnalyzer.py:/root/workspace/fuzzdrivergpt/libHeaderAnalyzer.py' % (cfgs.FDGPT_DIR),
-				'%s/libManualAPIDoc.py:/root/workspace/fuzzdrivergpt/libManualAPIDoc.py' % (cfgs.FDGPT_DIR),
-				'%s/libImproveQueryGen.py:/root/workspace/fuzzdrivergpt/libImproveQueryGen.py' % (cfgs.FDGPT_DIR),
-				'%s/libVR.py:/root/workspace/fuzzdrivergpt/libVR.py' % (cfgs.FDGPT_DIR),
+				'%s/apiusage/__init__.py:/root/workspace/fuzzdrivergpt/apiusage/__init__.py' % (cfgs.FDGPT_DIR),
+				'%s/apiusage/libHeaderAnalyzer.py:/root/workspace/fuzzdrivergpt/apiusage/libHeaderAnalyzer.py' % (cfgs.FDGPT_DIR),
+				'%s/apiusage/libManualAPIDoc.py:/root/workspace/fuzzdrivergpt/apiusage/libManualAPIDoc.py' % (cfgs.FDGPT_DIR),
+				'%s/generation/__init__.py:/root/workspace/fuzzdrivergpt/generation/__init__.py' % (cfgs.FDGPT_DIR),
+				'%s/generation/libImproveQueryGen.py:/root/workspace/fuzzdrivergpt/generation/libImproveQueryGen.py' % (cfgs.FDGPT_DIR),
+				'%s/validation/__init__.py:/root/workspace/fuzzdrivergpt/validation/__init__.py' % (cfgs.FDGPT_DIR),
+				'%s/validation/libVR.py:/root/workspace/fuzzdrivergpt/validation/libVR.py' % (cfgs.FDGPT_DIR),
 				'%s/cfgs.py:/root/workspace/fuzzdrivergpt/cfgs.py' % (cfgs.FDGPT_DIR),
 			]
 
-			if querymode == 'UGCTX' or querymode == 'SGUGCTX' or querymode == 'ALLUGCTX' or querymode == 'IMPROVE' or querymode == 'ANALYZE':
+			if querymode == 'UGCTX' or querymode == 'SGUGCTX' or querymode == 'ALLUGCTX' or querymode == 'IMPROVE':
 				if os.path.exists(cfgs.FDGPT_JDK):
 					dockervolumns.append("%s:/root/workspace/fuzzdrivergpt/jdk-19.0.2" % (cfgs.FDGPT_JDK))
 
@@ -62,26 +71,15 @@ class ContainerAnalyzer(BaseAnalyzer):
 
 				if querymode == 'SGUGCTX' or querymode == 'ALLUGCTX' or querymode == 'IMPROVE':
 					dockervolumns.append('%s:%s' % (cfgs.FDGPT_CRAWLED_USAGE, self.cfg.sgusagejson))
-				
-				if querymode == 'ANALYZE':
-					driverfile = params['targetDriverFile']
-					outfile = params['outJsonFile']
-					with open(outfile, 'w') as f:
-						f.write('aaa')
-
-					driverfile = os.path.abspath(driverfile)
-					outfile = os.path.abspath(outfile)
-
-					dockervolumns.append('%s:/tmp/analyze_target_driver.c' % (driverfile))
-					dockervolumns.append('%s:/tmp/analyze_result.json' % (outfile))
 
 			workdir = self.cfg.workdir
+			#print('@@@ the working dir is %s' % (self.cfg.workdir))
 
 			# run the docker
 			client = docker.from_env()
 
 			try:
-				self.docker = client.containers.run(imagename, command=dockercmd, volumes=dockervolumns, working_dir=workdir, privileged=True, remove=False, detach=True)
+				self.docker = client.containers.run(imagename, environment=envs, command=dockercmd, volumes=dockervolumns, working_dir=workdir, privileged=True, remove=False, detach=True)
 
 			except Exception as ex:
 				logger.error('meet exception when run docker %s' % (ex))
@@ -136,13 +134,6 @@ def main():
 	parser_listimprove.add_argument('-aa', '--additionalinfo', required=False, action='store_true', help='whether to add additional related info in improved query')
 	parser_listimprove.add_argument('-o', '--outfile', required=True, help='output json file')
 	parser_listimprove.set_defaults(workflow='listimprove')
-
-	parser_analyze = subparsers.add_parser('analyze', help='analyze the driver')
-	parser_analyze.add_argument('-l', '--language', required=True, help='languages e.g., c/c++/...')
-	parser_analyze.add_argument('-t', '--target', required=True, help='target project names e.g., jsonnet/libaom/...')
-	parser_analyze.add_argument('-i', '--targetdriverfile', required=True, help='target driver file')
-	parser_analyze.add_argument('-o', '--outjsonfile', required=True, help='analyze result json file')
-	parser_analyze.set_defaults(workflow='analyze')
 
 	args = parser.parse_args()
 
@@ -265,25 +256,6 @@ def main():
 		## dump queries to json
 		#with open(outfile, 'w') as f:
 		#	json.dump(queries, f, indent=2)
-
-	elif workflow == 'analyze':
-		targetdriverfile = args.targetdriverfile
-		language = args.language.lower()
-
-		target = args.target
-		outjsonfile = args.outjsonfile
-
-		buildyml = 'yml/' + language + '.yml'
-
-		print('-' * 30)
-		print('Language: %s' % (language))
-		print('Target: %s' % (target))
-		print('TargetDriverFile: %s' % (targetdriverfile))
-		print('OutJsonFile: %s' % (outjsonfile))
-		print('-' * 30)
-
-		analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
-		analyzer.analyze_wrap('ANALYZE', {'targetDriverFile': targetdriverfile, 'outJsonFile': outjsonfile})
 
 if __name__ == '__main__':
 	with launch_ipdb_on_exception():

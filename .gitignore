@@ -3,7 +3,7 @@ openaikey.txt
 apikey.txt
 venv
 meta/crawled_usage.json
-tools/jdk-19.0.2
+3rdparty/jdk-19.0.2
 openjdk-19.0.2_linux-x64_bin.tar.gz
 test_round*.json
 workdir

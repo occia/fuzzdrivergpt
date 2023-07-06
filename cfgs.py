@@ -38,9 +38,9 @@ FDGPT_WORKDIR = os.path.join(FDGPT_DIR, 'workdir')
 # log conf
 FDGPT_LOGCONF = os.path.join(FDGPT_DIR, 'logging.conf')
 
-# tools
-FDGPT_JDK = os.path.join(FDGPT_DIR, 'tools', 'jdk-19.0.2')
-FDGPT_ANTLR = os.path.join(FDGPT_DIR, 'tools', 'cc-func-parser-0.5-jar-with-dependencies.jar')
+# 3rdparty
+FDGPT_JDK = os.path.join(FDGPT_DIR, '3rdparty', 'jdk-19.0.2')
+FDGPT_ANTLR = os.path.join(FDGPT_DIR, '3rdparty', 'cc-func-parser-0.5-jar-with-dependencies.jar')
 
 # usage
 FDGPT_CRAWLED_USAGE = os.path.join(FDGPT_DIR, 'meta', 'crawled_usage.json')

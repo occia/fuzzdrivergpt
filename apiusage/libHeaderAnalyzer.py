@@ -8,10 +8,11 @@ import subprocess
 
 import clang.cindex
 
-import libVR
-import libImproveQueryGen
-import libManualAPIDoc
 from libTarget import TargetCfg
+
+from apiusage import libManualAPIDoc
+from validation import libVR
+from generation import libImproveQueryGen
 
 cpp_func_decls = [
 	clang.cindex.CursorKind.FUNCTION_DECL,
@@ -608,7 +609,7 @@ class BaseAnalyzer:
 
 		if queryMode == 'IMPROVE':
 			past_query, solution_idx, aaInfo = params['query'], params['solutionIdx'], params['aaInfo']
-		elif queryMode != 'ANALYZE':
+		else:
 			to_chatgpt = params['toChatGpt']
 
 		funcsig = params['funcsig'] if 'funcsig' in params else None
@@ -791,35 +792,6 @@ class BaseAnalyzer:
 			queries = libImproveQueryGen.genImprovedQueries(errVR, code, cut_code, aaInfo, api_funcs, api_usages) 
 
 			return queries
-
-		elif queryMode == 'ANALYZE':
-			# 0. install the deps
-			self.setup_java_env_for_antlr()
-
-			# get all api funcs list
-			funcs = []
-			api_funcs = None
-			if os.path.exists(self.cfg.apicachepickle):
-				obj = pickle.load(open(self.cfg.apicachepickle, 'rb'))
-				api_funcs, _ = obj['api_funcs'], obj['api_usages']
-			
-			else:
-				api_funcs = refine_list_using_header_analysis(self.cfg, funcs)
-			
-			# get all called apis in the driver using antlr
-			fuzzed_apis, fuzzed_funcs = {}, set([])
-			rslt = run_antlr_analysis('/tmp/analyze_target_driver.c')
-			for caller in rslt[0]["function_list"]:
-				callees = set(caller['callee_func'])
-				fuzzed_funcs.update(callees)
-
-			for func in fuzzed_funcs:
-				if func in api_funcs:
-					# we are in c language now, therefore the signature equals to the function name
-					fuzzed_apis[func] = api_funcs[func]
-
-			with open('/tmp/analyze_result.json', 'w') as f:
-				json.dump(list(fuzzed_apis.keys()), f, indent=2, sort_keys=True)
 
 def main():
 	pickleCfg, queryMode, paramfile = sys.argv[1], sys.argv[2], sys.argv[3]

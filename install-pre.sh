@@ -21,19 +21,19 @@ else
 	echo "[-] apikey.txt already exists, skip"
 fi
 
-# 2. install `jdk-19.0.2` into `./tools/jdk-19.0.2`
+# 2. install `jdk-19.0.2` into `./3rdparty/jdk-19.0.2`
 
-if [ ! -d tools/jdk-19.0.2 ]; then
+if [ ! -d 3rdparty/jdk-19.0.2 ]; then
 	wget https://download.java.net/java/GA/jdk19.0.2/fdb695a9d9064ad6b064dc6df578380c/7/GPL/openjdk-19.0.2_linux-x64_bin.tar.gz
 	tar xf openjdk-19.0.2_linux-x64_bin.tar.gz
-	mv jdk-19.0.2 tools/
+	mv jdk-19.0.2 3rdparty/
 
 	# remove the download 
 	rm openjdk-19.0.2_linux-x64_bin.tar.gz
 
-	echo "[+] tools/jdk-19.0.2 installed"
+	echo "[+] 3rdparty/jdk-19.0.2 installed"
 else
-	echo "[-] tools/jdk-19.0.2 already exists, skip"
+	echo "[-] 3rdparty/jdk-19.0.2 already exists, skip"
 fi
 
 # 3. install python requirements
