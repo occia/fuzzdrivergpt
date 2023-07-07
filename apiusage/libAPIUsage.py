@@ -1,11 +1,12 @@
+import os
 import json
 import logging
 
 logger = logging.getLogger(__name__)
 
-from apiusage.libProjAnalyzer import merge_example_usages
 from apiusage.libContainerWrapper import ContainerAnalyzer
 from apiusage import libSourceGraph
+from apiusage import libAPIDocManualCollector
 
 # this is the interface for building/caching/retrieving the API usage related information
 # currently it contains four types of usage information:
@@ -20,30 +21,6 @@ class APIUsage:
 		self.apiinfo = apiinfo
 		self.apidoc = apidoc
 		self.examples = examples
-
-	def update(self, newapiusage):
-		if self.funcsig != newapiusage.funcsig:
-			logger.ERROR('funcsig mismatch: updating apiusage of %s with %s' % (self.funcsig, apiusage.funcsig))
-			exit(1)
-
-		# update apiinfo
-		for k, v in newapiusage.apiinfo.items():
-			self.apiinfo[k] = v
-
-		# update apidoc
-		for doc in newapiusage.apidoc:
-			if doc not in self.apidoc:
-				self.apidoc.append(doc)
-
-		# update examples
-		if len(newapiusage.examples) != 0:
-			merged_examples = merge_example_usages([{self.funcsig: self.examples}, {self.funcsig: newapiusage.examples}])
-			self.examples = merged_examples[self.funcsig]
-
-	@staticmethod
-	def load_ana_result(targetcfg):
-		with open(targetcfg.projanaresult, 'r') as f:
-			return json.load(f)
 
 	@staticmethod
 	def buildAPIUsages(targetcfg, funcsig=None, skipsgcrawl=False):
@@ -67,8 +44,10 @@ class APIUsage:
 
 		if os.path.exists(targetcfg.apiusagecache):
 			logger.info("loading apiusage from cache '%s'" % (targetcfg.apiusagecache))
-			return
+			with open(targetcfg.apiusagecache, 'r') as f:
+				return json.load(f)
 
+		proj = targetcfg.target
 		analyzer = ContainerAnalyzer(targetcfg)
 
 		# 1. inputs collection
@@ -85,13 +64,24 @@ class APIUsage:
 				apilist = apilist.values()
 
 			# crawl usage snippets from sourcegraph
-			libSourceGraph.crawl_sg_usage(targetcfg.target, apilist, targetcfg.sgusagejson)
+			libSourceGraph.crawl_sg_usage(proj, apilist, targetcfg.sgusagejson)
 
 		# 2. usage extraction
 		analyzer.analyze_wrap({'anamode': 'collectapiusage', 'funcsig': funcsig}, debug=False)
 
+		# 3. update manually collected api doc
 		apiusages = []
-		for api_sig, api_info in analyzer.get_ana_results().items():
-			apiusages.append(APIUsage(api_sig, api_info['apiinfo'], api_info['apidoc'], api_info['examples']))
+		with open(targetcfg.apiusagecache, 'r') as f:
+			apiusages = json.load(f)
+
+		if proj in libAPIDocManualCollector.manualapidocs:
+			for apisig in libAPIDocManualCollector.manualapidocs[proj]:
+				if apisig not in apiusages:
+					logger.warning('manual api doc for (%s, %s) not found in apiusagecache' % (proj, apisig))
+					continue
+				apiusages[apisig]['apidoc'].append(libAPIDocManualCollector.manualapidocs[proj][apisig])
+
+		with open(targetcfg.apiusagecache, 'w') as f:
+			json.dump(apiusages, f, indent=2, sort_keys=True)
 
 		return apiusages

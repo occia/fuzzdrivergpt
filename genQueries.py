@@ -3,8 +3,10 @@ import json
 import argparse
 
 from libTarget import TargetCfg
+
 from apiusage.libContainerWrapper import ContainerAnalyzer
 from apiusage import libAPIUsage
+from generation import libPrompt
 
 from ipdb import launch_ipdb_on_exception
 
@@ -167,14 +169,14 @@ def main():
 
 		logger.info('=== handling %s ===' % (target))
 
-		#analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
-		#analyzer.analyze_wrap({'anamode': 'collectapiusage', 'toChatGpt': to_chatgpt, 'funcsig': funcsig}, debug=debug)
 		targetcfg = TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target)
 		libAPIUsage.APIUsage.buildAPIUsages(targetcfg)
 
-		## dump queries to json
-		#with open(outfile, 'w') as f:
-		#	json.dump(queries, f, indent=2)
+		queries = libPrompt.genQueries(querymode, targetcfg, {'to_chatgpt': to_chatgpt, 'targetapis': [ funcsig ]})
+
+		# dump queries to json
+		with open(outfile, 'w') as f:
+			json.dump(queries, f, indent=2)
 
 if __name__ == '__main__':
 	with launch_ipdb_on_exception():

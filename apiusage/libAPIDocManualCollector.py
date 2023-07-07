@@ -1,37 +1,8 @@
-#bind9 civetweb croaring gdk-pixbuf gpac hiredis igraph inchi libbpf libiec61850 liblouis libmodbus libpg_query libucl lua md4c oniguruma proftpd pupnp quickjs selinux spdk tmux w3m
-
-#civetweb
-#https://github.com/civetweb/civetweb/blob/master/docs/api/mg_get_response.md
-#
-#gdk-pixbuf
-#https://developer-old.gnome.org/gdk-pixbuf/stable/gdk-pixbuf-Animations.html
-#
-#hiredis
-#https://github.com/redis/hiredis/blob/5d84c8cfdb3f3709499970bc450f5308f0c832c1/hiredis.c#L565
-#
-#igraph
-#https://github.com/igraph/igraph/blob/ee4994b34cf18e4de50b997014ecfb740b960b96/src/connectivity/separators.c#L425
-#
-#inchi
-#https://github.com/metamolecular/inchi/blob/0fc7adc58d4ff1c481b26e0de53cc8a404c3d381/INCHI_BASE/src/inchi_api.h#L1106
-#
-#
-#libmodbus
-#https://libmodbus.org/reference/modbus_read_bits/
-#
-#lua
-#https://www.lua.org/manual/5.3/manual.html
-#
-#md4c
-#https://github.com/mity/md4c/blob/e9ff661ff818ee94a4a231958d9b6768dc6882c9/src/md4c-html.h#L59
-#
-#oniguruma
-#https://github.com/kkos/oniguruma/blob/078f95efd45ef5e266b67307e6b3c5ffc3de38ab/doc/API#L62
-
-# should appear 
-# libucl croaring libbpf libiec61850 liblouis pupnp
-
-apidocs = {
+'''
+partial api doc prepared manually
+TODO: make this automatically analyzed later
+'''
+manualapidocs = {
 	"libzip": {
 "zip_fread": '''
 /*
