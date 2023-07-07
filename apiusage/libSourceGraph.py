@@ -30,13 +30,16 @@ def crawl_sg_usage(proj, apis, outfile):
     if os.path.exists(outfile):
         with open(outfile, 'r') as f:
             query_result = json.load(f)
-    
+
     if proj not in query_result:
         query_result[proj] = {}
 
     for api in apis:
-        if api not in query_result[proj]:
-            query_result[proj][api] = do_sg_query(api)
+        if api in query_result[proj]:
+            logger.info('skip already crawled api (%s, %s)' % (proj, api))
+            continue
+
+        query_result[proj][api] = do_sg_query(api)
 
     with open(outfile, 'w') as f:
         json.dump(query_result, f, indent=2, sort_keys=True)
