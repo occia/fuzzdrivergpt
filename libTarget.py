@@ -40,7 +40,7 @@ class TargetCfg:
 		self.cachedir = os.path.join(self.basedir, 'targets', self.target, self.language, 'cache')
 
 		self.apiblocklist = self.cfgs['apiblocklist']
-		self.headers = self.get_header_files(self.cfgs['headers'])
+		self.headerdict = self.cfgs['headers']
 		self.binaries = self.cfgs['binaries']
 		self.imagename = self.cfgs['image']
 		self.precode = eval('"""' + self.cfgs['precode'] + '"""')
@@ -123,13 +123,12 @@ class TargetCfg:
 	def pickleFrom(to):
 		with open(to, 'rb') as f:
 			obj = pickle.load(f)
-			obj.headers = obj.get_header_files(obj.cfgs['headers'])
 			return obj
 
-	def get_header_files(self, header_dict):
+	def get_header_files(self):
 		files = {}
 
-		for prefix, pattern in header_dict.items():
+		for prefix, pattern in self.headerdict.items():
 			absprefix = str(Path(prefix).resolve())
 			for p in Path(prefix).glob(pattern):
 				if p.is_file():

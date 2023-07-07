@@ -30,7 +30,7 @@ def main():
 	parser_gen.add_argument('-l', '--language', required=True, help='languages e.g., c/c++/...')
 	parser_gen.add_argument('-D', '--debug', required=False, action='store_true', help='debug mode')
 	parser_gen.add_argument('--chatgpt', required=False, action='store_true', help='query is for chatgpt or not')
-	#parser_gen.add_argument('-o', '--output', required=False, default='./input_queries.json', help='the file generated query json written to')
+	parser_gen.add_argument('-o', '--output', required=False, default='./input_queries.json', help='the file generated query json written to')
 	parser_gen.add_argument('-q', '--querymode', required=True, choices=['NAIVE', 'SMKTST', 'BACTX', 'DOCTX', 'UGCTX', 'SGUGCTX', 'ALLUGCTX'], help='query generation modes')
 	parser_gen.add_argument('-t', '--target', required=True, help='target project')
 	parser_gen.add_argument('-f', '--funcsig', required=True, help='target API function signature')
@@ -148,7 +148,7 @@ def main():
 		target = args.target
 		debug = args.debug
 		funcsig = args.funcsig
-		#outfile = args.output
+		outfile = args.output
 		querymode = args.querymode
 		to_chatgpt = args.chatgpt
 		buildyml = 'yml/' + language + '.yml'
@@ -158,7 +158,7 @@ def main():
 		print('Target: %s' % (target))
 		print('FuncSig: %s' % (funcsig))
 		print('Debug: %s' % (debug))
-		#print('Output: %s' % (outfile))
+		print('Output: %s' % (outfile))
 		print('QueryMode: %s' % (querymode))
 		print('ToChatGPT: %s' % (to_chatgpt))
 		print('BuildYml: %s' % (buildyml))
@@ -170,9 +170,9 @@ def main():
 		logger.info('=== handling %s ===' % (target))
 
 		targetcfg = TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target)
-		libAPIUsage.APIUsage.buildAPIUsages(targetcfg)
+		apiusages = libAPIUsage.APIUsage.buildAPIUsages(targetcfg)
 
-		queries = libPrompt.genQueries(querymode, targetcfg, {'to_chatgpt': to_chatgpt, 'targetapis': [ funcsig ]})
+		queries = libPrompt.genQueries(querymode, targetcfg, {'to_chatgpt': to_chatgpt, 'targetapis': [ funcsig ], 'apiusages': apiusages, 'debug': debug})
 
 		# dump queries to json
 		with open(outfile, 'w') as f:

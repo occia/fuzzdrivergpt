@@ -49,7 +49,7 @@ def fully_qualified(c):
             return res + '::' + c.spelling
     return c.spelling
 
-def traverse(source, node, func_list):
+def traverse(source, prefix, node, func_list):
 	global cpp_func_decls, permissive_acc_specs
 
 	for child in node.get_children():
@@ -61,6 +61,7 @@ def traverse(source, node, func_list):
 					#print(' -> %s %s %s %s %s' % (child.mangled_name, child.access_specifier, child.extent, child.brief_comment, child.raw_comment))
 					func_list.append({
 						'header': source,
+						'prefix': prefix,
 						'mangled_name': str(child.mangled_name), 
 						'access': str(child.access_specifier),
 						'extent': ((child.extent.start.file.name, child.extent.start.line, child.extent.start.column, child.extent.start.offset), (child.extent.end.file.name, child.extent.end.line, child.extent.end.column, child.extent.end.offset)),
@@ -78,14 +79,15 @@ def traverse(source, node, func_list):
 				# don't collect the methods from abstract structs/classes
 				continue
 
-			traverse(source, child, func_list)
+			traverse(source, prefix, child, func_list)
 
 def refine_list_using_header_analysis(cfg):
 	func_list = []
 
-	print('cfg.headers: %s' % (cfg.headers))
+	headers = cfg.get_header_files()
+	print('cfg headers: %s' % (headers))
 
-	for header in cfg.headers.keys():
+	for header, headerprefix in headers.items():
 		if not (header.endswith('.h') or header.endswith('.hpp')):
 			# currently we skip c++ template header files
 			print('[WARN] skip unknown files inside header %s' % (header))
@@ -97,7 +99,7 @@ def refine_list_using_header_analysis(cfg):
 		index = clang.cindex.Index.create()
 		tu = index.parse(header, cfg.compileopts)
 		root = tu.cursor
-		traverse(header, root, func_list)
+		traverse(header, headerprefix, root, func_list)
 
 	print('func_list len is %s' % (len(func_list)))
 	# filter the func not in the block list
@@ -454,7 +456,7 @@ class BaseAnalyzer:
 			apilist = { sig: info['fullname'] for sig, info in api_funcs.items() }
 
 			# dump
-			with open(cfg.projanaresult, 'w') as f:
+			with open(self.cfg.projanaresult, 'w') as f:
 				json.dump(apilist, f, indent=2, sort_keys=True)
 
 		elif anamode == 'listapisfromnm':
@@ -465,7 +467,7 @@ class BaseAnalyzer:
 			apilist = { func: func for func in funcs }
 
 			# dump
-			with open(cfg.projanaresult, 'w') as f:
+			with open(self.cfg.projanaresult, 'w') as f:
 				json.dump(apilist, f, indent=2, sort_keys=True)
 
 		elif anamode == 'collectapiusage':
@@ -473,7 +475,7 @@ class BaseAnalyzer:
 			results = collect_api_usages(self.cfg, funcsig)
 		
 			# dump
-			with open(cfg.apiusagecache, 'w') as f:
+			with open(self.cfg.apiusagecache, 'w') as f:
 				json.dump(results, f, indent=2, sort_keys=True)
 
 		else:
