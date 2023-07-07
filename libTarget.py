@@ -72,8 +72,8 @@ class TargetCfg:
 		self.headerparampickle = os.path.join(self.workdir, 'headerparam.pickle')
 		self.projanaresult = os.path.join(self.workdir, 'proj_analyzer_result.json')
 
+		self.apiusagecache = os.path.join(self.cachedir, 'apiusages.json')
 		self.sgusagejson = os.path.join(self.cachedir, 'sgusage.json')
-		self.apicachepickle = os.path.join(self.cachedir, 'apicache.pickle')
 
 		self.compileopts = self.cfgs['compile']
 		# we do not care this

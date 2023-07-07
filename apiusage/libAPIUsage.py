@@ -65,18 +65,24 @@ class APIUsage:
 		# 3. usage caching (cache the usages in the local storage)
 		# both 1 and 2 can be extended for more ways of collection and extraction
 
+		if os.path.exists(targetcfg.apiusagecache):
+			logger.info("loading apiusage from cache '%s'" % (targetcfg.apiusagecache))
+			return
+
 		analyzer = ContainerAnalyzer(targetcfg)
 
 		# 1. inputs collection
 		if not skipsgcrawl:
 			# get api list
 			analyzer.analyze_wrap({'anamode': 'listapisfromheaders'}, debug=False)
-			apilist = list(analyzer.get_ana_results().keys())
+			apilist = analyzer.get_ana_results()
 			if funcsig != None:
 				if funcsig not in apilist:
 					logger.error('funcsig %s not in apilist' % funcsig)
 					exit(1)
-				apilist = [ funcsig ]
+				apilist = [ apilist[funcsig] ]
+			else:
+				apilist = apilist.values()
 
 			# crawl usage snippets from sourcegraph
 			libSourceGraph.crawl_sg_usage(targetcfg.target, apilist, targetcfg.sgusagejson)

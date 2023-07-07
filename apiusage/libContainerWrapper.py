@@ -48,10 +48,6 @@ class ContainerAnalyzer(BaseAnalyzer):
 				'%s/apiusage/__init__.py:/root/workspace/fuzzdrivergpt/apiusage/__init__.py' % (cfgs.FDGPT_DIR),
 				'%s/apiusage/libProjAnalyzer.py:/root/workspace/fuzzdrivergpt/apiusage/libProjAnalyzer.py' % (cfgs.FDGPT_DIR),
 				'%s/apiusage/libAPIDocManualCollector.py:/root/workspace/fuzzdrivergpt/apiusage/libAPIDocManualCollector.py' % (cfgs.FDGPT_DIR),
-				'%s/generation/__init__.py:/root/workspace/fuzzdrivergpt/generation/__init__.py' % (cfgs.FDGPT_DIR),
-				'%s/generation/libImproveQueryGen.py:/root/workspace/fuzzdrivergpt/generation/libImproveQueryGen.py' % (cfgs.FDGPT_DIR),
-				'%s/validation/__init__.py:/root/workspace/fuzzdrivergpt/validation/__init__.py' % (cfgs.FDGPT_DIR),
-				'%s/validation/libVR.py:/root/workspace/fuzzdrivergpt/validation/libVR.py' % (cfgs.FDGPT_DIR),
 				'%s/cfgs.py:/root/workspace/fuzzdrivergpt/cfgs.py' % (cfgs.FDGPT_DIR),
 			]
 

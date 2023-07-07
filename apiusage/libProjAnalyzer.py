@@ -3,15 +3,11 @@ import re
 import sys
 import json
 import pickle
-import random
 import subprocess
 
 import clang.cindex
 
 from libTarget import TargetCfg
-
-from validation import libVR
-from generation import libImproveQueryGen
 
 cpp_func_decls = [
 	clang.cindex.CursorKind.FUNCTION_DECL,
@@ -407,12 +403,8 @@ def collect_api_usages(cfg, funcsig):
 	api_sg_usages = get_sourcegraph_usage_functions(cfg, analyzed_apis, api_funcs)
 	api_usages = merge_example_usages( [ api_sg_usages, api_self_usages ] )
 
-	return merge_ana_results(api_funcs, api_usages)
-
-def merge_ana_results(api_funcs, api_usages):
 	results = {}
 	for api_sig, api_info in api_funcs.items():
-
 		# api basics
 		results[api_sig] = { 'funcsig': api_sig, 'apiinfo' : api_info, 'apidoc' : [], 'examples' : [] }
 
@@ -459,19 +451,31 @@ class BaseAnalyzer:
 		anamode = params['anamode']
 		if anamode == 'listapisfromheaders':
 			api_funcs = refine_list_using_header_analysis(self.cfg)
-			return merge_ana_results(api_funcs, {})
+			apilist = { sig: info['fullname'] for sig, info in api_funcs.items() }
+
+			# dump
+			with open(cfg.projanaresult, 'w') as f:
+				json.dump(apilist, f, indent=2, sort_keys=True)
 
 		elif anamode == 'listapisfromnm':
 			# WARN: currently not use, the sig seems problematic?
 			funcs = find_exported_func_sig_list(self.cfg.binaries)
 			#print(funcs)
-			return merge_ana_results({apisig : {} for apisig in funcs}, {})
+			# TODO: this can be problematic in non-C language since api sig is different with api name
+			apilist = { func: func for func in funcs }
+
+			# dump
+			with open(cfg.projanaresult, 'w') as f:
+				json.dump(apilist, f, indent=2, sort_keys=True)
 
 		elif anamode == 'collectapiusage':
 			funcsig = params['funcsig'] if 'funcsig' in params else None
 			results = collect_api_usages(self.cfg, funcsig)
-			return results
 		
+			# dump
+			with open(cfg.apiusagecache, 'w') as f:
+				json.dump(results, f, indent=2, sort_keys=True)
+
 		else:
 			raise Exception('Unknown anamode %s' % (anamode))
 
@@ -486,13 +490,9 @@ def main():
 	with open(paramfile, 'rb') as f:
 		params = pickle.load(f)
 
-	# analyze
+	# analyze & save results
 	analyzer = BaseAnalyzer(cfg)
-	results = analyzer.analyze_impl(params)
-
-	# dump
-	with open(cfg.projanaresult, 'w') as f:
-		json.dump(results, f, indent=2, sort_keys=True)
+	analyzer.analyze_impl(params)
 
 if __name__ == '__main__':
 	main()
