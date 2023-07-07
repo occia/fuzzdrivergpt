@@ -13,9 +13,10 @@ import argparse
 
 import cfgs
 import libTarget
-import genQueries
 
+from apiusage.libAPIUsage import APIUsage
 from validation import libVR
+from generation import libPrompt
 from generation import libQuery
 from generation import handleChatGPTResult
 
@@ -56,6 +57,8 @@ class IterativeQueryRecord:
 
 		self._recordIdx = recordIdx
 		self.recordIdx = 'iter-account-%s-' % (self._recordIdx)
+
+		self.cfg = libTarget.TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
 
 		# acceptQueryIDs: queries that have acceptable validation results, it is a subset of leafQueryIDs
 		self.acceptQueryIDs = set([])
@@ -100,42 +103,34 @@ class IterativeQueryRecord:
 	def generateAAQueries(self, last_query):
 		next_queries = []
 
-		cfg = libTarget.TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
-		analyzer = genQueries.ContainerAnalyzer(cfg)
-		analyzer.analyze_wrap('IMPROVE', {'query': last_query, 'solutionIdx': 0, 'aaInfo': True, 'funcsig' : self.funcsig})
+		generated_queries = libPrompt.genQueries('IMPROVE', self.cfg, {'targetapis': [ self.funcsig ], 'apiusages' : APIUsage.getAPIUsages(self.target), 'aa_info': True, 'solution_idx': 0, 'past_query' : last_query})
 
-		with open(analyzer.cfg.queryfile, 'r') as f:
-			next_query_ctnts = json.load(f)
-			for query_ctnt in next_query_ctnts:
-				next_query = copy.deepcopy(last_query)
+		for generated_query in generated_queries:
+			next_query = copy.deepcopy(last_query)
 
-				next_query['query'] = query_ctnt
-				next_query['id'] = self.getQidBase(last_query['id']) + '-AAIMPROVE'
-				next_query['improveHistory'].append(last_query['id'])
+			next_query['query'] = generated_query
+			next_query['id'] = self.getQidBase(last_query['id']) + '-AAIMPROVE'
+			next_query['improveHistory'].append(last_query['id'])
 
-				del next_query['result']
-				next_queries.append(next_query)
+			del next_query['result']
+			next_queries.append(next_query)
 
 		return next_queries
 
 	def generateBAQueries(self, last_query):
 		next_queries = []
 
-		cfg = libTarget.TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
-		analyzer = genQueries.ContainerAnalyzer(cfg)
-		analyzer.analyze_wrap('IMPROVE', {'query': last_query, 'solutionIdx': 0, 'aaInfo': False, 'funcsig': self.funcsig})
+		generated_queries = libPrompt.genQueries('IMPROVE', self.cfg, {'targetapis': [ self.funcsig ], 'apiusages' : APIUsage.getAPIUsages(self.target), 'aa_info': False, 'solution_idx': 0, 'past_query' : last_query})
 
-		with open(analyzer.cfg.queryfile, 'r') as f:
-			next_query_ctnts = json.load(f)
-			for query_ctnt in next_query_ctnts:
-				next_query = copy.deepcopy(last_query)
+		for generated_query in generated_queries:
+			next_query = copy.deepcopy(last_query)
 
-				next_query['query'] = query_ctnt
-				next_query['improveHistory'].append(last_query['id'])
-				next_query['id'] = self.getQidBase(last_query['id']) + '-BAIMPROVE'
+			next_query['query'] = generated_query
+			next_query['improveHistory'].append(last_query['id'])
+			next_query['id'] = self.getQidBase(last_query['id']) + '-BAIMPROVE'
 
-				del next_query['result']
-				next_queries.append(next_query)
+			del next_query['result']
+			next_queries.append(next_query)
 		
 		return next_queries
 
@@ -144,18 +139,7 @@ class IterativeQueryRecord:
 		self.queries[new_query['id']] = new_query
 
 	def generateInitialQueries(self, initialMode):
-		queries = []
-
-		cfg = libTarget.TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=self.buildyml, target=self.target, task_idx=self.recordIdx)
-		analyzer = genQueries.ContainerAnalyzer(cfg)
-		analyzer.analyze_wrap(initialMode, {'toChatGpt': True, 'funcsig': self.funcsig})
-		with open(analyzer.cfg.queryfile, 'r') as f:
-			gen_queries = json.load(f)
-			for query in gen_queries:
-				if query['info']['mangled_name'] == self.funcsig:
-					queries.append(query)
-
-		return queries
+		return libPrompt.genQueries(initialMode, self.cfg, { 'targetapis': [ self.funcsig ], 'apiusages' : APIUsage.getAPIUsages(self.target), 'to_chatgpt': True })
 
 	def generateNextQueries(self):
 		# generate next queries

@@ -15,12 +15,24 @@ from apiusage import libAPIDocManualCollector
 # 3. API usage example code snippets
 
 class APIUsage:
+	loadedusages = {}
 
 	def __init__(self, funcsig, apiinfo={}, apidoc=[], examples=[]):
 		self.funcsig = funcsig
 		self.apiinfo = apiinfo
 		self.apidoc = apidoc
 		self.examples = examples
+
+	@staticmethod
+	def getAPIUsages(proj):
+		return APIUsage.loadedusages[proj] if proj in APIUsage.loadedusages else {}
+
+	@staticmethod
+	def loadAPIUsagesFromFiles(proj, file):
+		with open(file, 'r') as f:
+			APIUsage.loadedusages[proj] = json.load(f)
+		
+		return APIUsage.loadedusages[proj]
 
 	@staticmethod
 	def buildAPIUsages(targetcfg, funcsig=None, skipsgcrawl=False):
@@ -42,12 +54,12 @@ class APIUsage:
 		# 3. usage caching (cache the usages in the local storage)
 		# both 1 and 2 can be extended for more ways of collection and extraction
 
+		proj = targetcfg.target
+
 		if os.path.exists(targetcfg.apiusagecache):
 			logger.info("loading apiusage from cache '%s'" % (targetcfg.apiusagecache))
-			with open(targetcfg.apiusagecache, 'r') as f:
-				return json.load(f)
+			return APIUsage.loadAPIUsagesFromFiles(proj, targetcfg.apiusagecache)
 
-		proj = targetcfg.target
 		analyzer = ContainerAnalyzer(targetcfg)
 
 		# 1. inputs collection
@@ -83,5 +95,5 @@ class APIUsage:
 
 		with open(targetcfg.apiusagecache, 'w') as f:
 			json.dump(apiusages, f, indent=2, sort_keys=True)
-
-		return apiusages
+		
+		return APIUsage.loadAPIUsagesFromFiles(proj, targetcfg.apiusagecache)

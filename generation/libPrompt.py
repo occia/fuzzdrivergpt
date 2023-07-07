@@ -240,7 +240,7 @@ def genQueries(mode, cfg, params):
 		return gen_XXUGCTX_queries(cfg, targetapis, apiusages, to_chatgpt)
 
 	elif mode == 'IMPROVE':
-		past_query, solution_idx, apiusages, aa_info = params['past_query'], params['solution_idx'], params['targetapis'], params['apiusages'], params['aa_info']
+		past_query, solution_idx, apiusages, aa_info = params['past_query'], params['solution_idx'], params['apiusages'], params['aa_info']
 
 		validation = past_query['result']['validations'][solution_idx]
 		code = validation['code']
@@ -259,7 +259,7 @@ def genQueries(mode, cfg, params):
 
 		errVR = libVR.BasicVR.load(validation['vali_result'])
 		logger.debug(errVR._desc)
-		queries = libImprovePrompt.genImprovedQueries(errVR, code, cut_code, aa_info, fullapis, api_usages) 
+		queries = libImprovePrompt.genImprovedQueries(errVR, code, cut_code, aa_info, apiusages) 
 
 		return queries
 

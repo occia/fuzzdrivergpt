@@ -91,11 +91,11 @@ def get_api_info(api_func):
 	else:
 		return '%s\nextern %s %s(%s);' % (raw_comment, ret, fullname, args)
 
-def get_api_usages(api_usages, api):
-	if api in api_usages:
+def get_example_usages(examples, api):
+	if api in examples:
 		# TODO: we only pick the first five for now
 		all_usages = []
-		for filename, _, funcctnt, _ in api_usages[api][:5]:
+		for filename, _, funcctnt, _ in examples[api][:5]:
 			usage_lines = [ '// @ examples of API `%s` usage from %s' % (api, filename) ]
 			for line in funcctnt.split('\n'):
 				usage_lines.append("// " + line)
@@ -105,13 +105,13 @@ def get_api_usages(api_usages, api):
 	else:
 		return []
 
-def get_related_infos(cut_code, err_line, aainfo, api_funcs, api_usages):
+def get_related_infos(cut_code, err_line, aainfo, api_funcs, examples):
 	related_infos = [ '' ]
 	if aainfo:
 		related_api = find_relevant_apis(cut_code, err_line, api_funcs)
 		if related_api != None:
 			related_api_info = get_api_info(api_funcs[related_api])
-			for related_api_usage in get_api_usages(api_usages, related_api):
+			for related_api_usage in get_example_usages(examples, related_api):
 				related_info = '\nThe definition of `%s`:\n%s\n\n%s\n\n' % (related_api, related_api_info, related_api_usage)
 				related_infos.append(related_info)
 
@@ -210,9 +210,12 @@ Based on the above information, fix the code if necessary.
 If the function returns a None, no need to query again for improving it
 If the function returns a string, it is the improved query that needs to be queried again
 '''
-def genImprovedQueries(errVR, code, cut_code, aainfo, api_funcs, api_usages):
+def genImprovedQueries(errVR, code, cut_code, aainfo, apiusages):
 	# TODO: handle this type of error later
 	#if errVR.ty == 'ERR-CORR'
+
+	api_funcs = { apisig : apiusages[apisig]['apiinfo'] for apisig in apiusages }
+	examples = { apisig : apiusages[apisig]['examples'] for apisig in apiusages }
 
 	next_queries = []
 
@@ -228,7 +231,7 @@ def genImprovedQueries(errVR, code, cut_code, aainfo, api_funcs, api_usages):
 		err_desc = errVR._desc.strip()
 
 		# TODO: get related information
-		for related_info in get_related_infos(cut_code, err_line, aainfo, api_funcs, api_usages):
+		for related_info in get_related_infos(cut_code, err_line, aainfo, api_funcs, examples):
 			next_query = ERR_PRSE_TMPL % (cut_code, err_line, err_desc, related_info)
 			next_queries.append(next_query)
 		return next_queries
@@ -246,7 +249,7 @@ def genImprovedQueries(errVR, code, cut_code, aainfo, api_funcs, api_usages):
 				err_line = line.strip()
 				break
 
-		for related_info in get_related_infos(cut_code, err_line, aainfo, api_funcs, api_usages):
+		for related_info in get_related_infos(cut_code, err_line, aainfo, api_funcs, examples):
 			next_query = ERR_LINK_TMPL % (cut_code, firstUnknownFunction, related_info)
 			next_queries.append(next_query)
 		return next_queries
@@ -354,7 +357,7 @@ def genImprovedQueries(errVR, code, cut_code, aainfo, api_funcs, api_usages):
 					return [ next_query ]
 				else:
 					crash_line = 'The crash line is:\n' + lines[crash_line_no - 1].strip()
-					for related_info in get_related_infos(cut_code, lines[crash_line_no - 1].strip(), aainfo, api_funcs, api_usages):
+					for related_info in get_related_infos(cut_code, lines[crash_line_no - 1].strip(), aainfo, api_funcs, examples):
 						next_query = ERR_FUZZ_CRASH_TMPL % (cut_code, oracle, crash_line, '\n'.join(crash_frames), '\n\n'.join([ 'The frame `%s` related code:\n%s' % (frame_title, frame_code) for frame_title, frame_code in code_around_frames.items() ]), related_info)
 						next_queries.append(next_query)
 					return next_queries

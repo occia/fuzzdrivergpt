@@ -2,9 +2,8 @@ import os
 import pickle
 import argparse
 
-from generation import libQuery
+from apiusage.libAPIUsage import APIUsage
 from generation.libIterative import IterativeQueryRecord
-from libTarget import TargetCfg
 
 from prepareOSSFuzzImage import is_fuzzdrivergpt_image_exist, get_fuzzdrivergpt_imgname
 
@@ -20,6 +19,9 @@ def iterative_workflow(rounds, maxiterations, initialquerymode, accountidx, mode
 	validator_url = 'https://xxx.xxx.xxx.xxx:xxx'
 
 	query_record = IterativeQueryRecord(model, language, target, funcsig, improvestrategy, validator_url, headersAuth, initialquerymode, accountidx)
+
+	# build API usages
+	APIUsage.buildAPIUsages(query_record.cfg)
 
 	iterations = 0
 
