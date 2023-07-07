@@ -4,6 +4,7 @@ import argparse
 
 from libTarget import TargetCfg
 from apiusage.libContainerWrapper import ContainerAnalyzer
+from apiusage import libAPIUsage
 
 from ipdb import launch_ipdb_on_exception
 
@@ -48,6 +49,10 @@ def main():
 	parser_listimprove.set_defaults(workflow='listimprove')
 
 	args = parser.parse_args()
+
+	if not cfgs.check_and_load_cfgs(check_openai_keys=False):
+		logger.error('cfgs check failed, exit')
+		exit(1)
 
 	workflow = args.workflow
 	if workflow is None:
@@ -162,8 +167,10 @@ def main():
 
 		logger.info('=== handling %s ===' % (target))
 
-		analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
-		analyzer.analyze_wrap({'toChatGpt': to_chatgpt, 'funcsig': funcsig}, debug=debug)
+		#analyzer = ContainerAnalyzer(TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target))
+		#analyzer.analyze_wrap({'anamode': 'collectapiusage', 'toChatGpt': to_chatgpt, 'funcsig': funcsig}, debug=debug)
+		targetcfg = TargetCfg(basedir=cfgs.FDGPT_WORKDIR, build_cfgs_yml=buildyml, target=target)
+		libAPIUsage.APIUsage.buildAPIUsages(targetcfg)
 
 		## dump queries to json
 		#with open(outfile, 'w') as f:

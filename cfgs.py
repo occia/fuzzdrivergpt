@@ -10,8 +10,11 @@ def get_proj_dir():
 	
 	return os.path.abspath('.')
 
-def get_apikey_cfg(cfgfile):
+def load_apikey_cfg(cfgfile):
 	pairs = {}
+	if not os.path.exists(cfgfile):
+		return pairs
+
 	with open(cfgfile, 'r') as f:
 		for line in f.readlines():
 			line = line.strip()
@@ -22,7 +25,7 @@ def get_apikey_cfg(cfgfile):
 			k, v = line.split('=')
 			pairs[k.strip()] = v.strip()
 	
-	return pairs['OPENAI_APIKEY'], pairs['OPENAI_ORGID']
+	return pairs
 
 def configure_log(loglevel):
 	pass
@@ -42,18 +45,16 @@ FDGPT_LOGCONF = os.path.join(FDGPT_DIR, 'logging.conf')
 FDGPT_JDK = os.path.join(FDGPT_DIR, '3rdparty', 'jdk-19.0.2')
 FDGPT_ANTLR = os.path.join(FDGPT_DIR, '3rdparty', 'cc-func-parser-0.5-jar-with-dependencies.jar')
 
-# usage
-FDGPT_CRAWLED_USAGE = os.path.join(FDGPT_DIR, 'meta', 'crawled_usage.json')
-
 # ossfuzz supports
 FDGPT_OSSFUZZ_TARGETS = os.path.join(FDGPT_DIR, 'ossfuzz-targets')
 
 # apikey cfg
 FDGPT_APIKEY_FILE = os.path.join(FDGPT_DIR, 'apikey.txt')
 FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID = None, None
+FDGPT_SOURCEGRAPH_APIKEY = None
 
-def check_and_load_cfgs():
-	global FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID
+def check_and_load_cfgs(check_openai_keys=True):
+	global FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID, FDGPT_SOURCEGRAPH_APIKEY
 
 	init_log()
 
@@ -69,16 +70,22 @@ def check_and_load_cfgs():
 		logging.error("ossfuzz targets '%s' not found" % (FDGPT_OSSFUZZ_TARGETS))
 		return False
 
-	if not os.path.exists(FDGPT_APIKEY_FILE):
-		logging.error("apikey cfg file '%s' not found" % (FDGPT_APIKEY_FILE))
-		return False
+	keypairs = load_apikey_cfg(FDGPT_APIKEY_FILE)
+	if check_openai_keys:
+		if 'OPENAI_APIKEY' not in keypairs or 'OPENAI_ORGID' not in keypairs:
+			logging.error("apikey cfg file '%s' does not contain openai keys" % (FDGPT_APIKEY_FILE))
+			return False
 
-	FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID = get_apikey_cfg(FDGPT_APIKEY_FILE)
+		FDGPT_OPENAI_APIKEY, FDGPT_OPENAI_ORGID = keypairs['OPENAI_APIKEY'], keypairs['OPENAI_ORGID']
 
-	if not os.path.exists(FDGPT_CRAWLED_USAGE):
-		logger.warning("crawled usage '%s' not found, create an empty one and the examples used in prompts will only be picked from the local repository" % (FDGPT_CRAWLED_USAGE))
-		with open(FDGPT_CRAWLED_USAGE, 'w') as f:
-			f.write('{}')
+	else:
+		logging.info("skip checking openai keys")
+	
+	if 'SOURCEGRAPH_APIKEY' not in keypairs:
+		logging.warning("apikey cfg file '%s' does not contain sourcegraph api key, go get one APIKEY from '%s' to boost the crawling process" % (FDGPT_APIKEY_FILE, 'https://docs.sourcegraph.com/cli/how-tos/creating_an_access_token'))
+		FDGPT_SOURCEGRAPH_APIKEY = ''
+	else:
+		FDGPT_SOURCEGRAPH_APIKEY = keypairs['SOURCEGRAPH_APIKEY']
 
 	return True
 
@@ -88,6 +95,5 @@ if __name__ == '__main__':
 	logger.info('project dir is %s' % FDGPT_DIR)
 	logger.info('jdk dir is %s' % FDGPT_JDK)
 	logger.info('antlr jar is %s' % FDGPT_ANTLR)
-	logger.info('crawled usage is %s' % FDGPT_CRAWLED_USAGE)
 	logger.info('ossfuzz targets dir is %s' % FDGPT_OSSFUZZ_TARGETS)
 

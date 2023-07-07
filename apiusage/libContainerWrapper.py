@@ -1,4 +1,5 @@
 import os
+import json
 import docker
 import pickle
 
@@ -17,6 +18,10 @@ class ContainerAnalyzer(BaseAnalyzer):
 		if not os.path.exists(self.cfg.workdir):
 			os.makedirs(self.cfg.workdir, exist_ok=True)
 		self.docker = None
+
+	def get_ana_results(self):
+		with open(self.cfg.projanaresult, 'r') as f:
+			return json.load(f)
 
 	def analyze_wrap(self, params, debug=False):
 		if self.cfg.language == 'c':
@@ -51,8 +56,6 @@ class ContainerAnalyzer(BaseAnalyzer):
 			]
 
 			dockervolumns.append("%s:/tmp/cc-func-parser-0.5-jar-with-dependencies.jar" % (cfgs.FDGPT_ANTLR))
-
-			dockervolumns.append('%s:%s' % (cfgs.FDGPT_CRAWLED_USAGE, self.cfg.sgusagejson))
 
 			if os.path.exists(cfgs.FDGPT_JDK):
 				dockervolumns.append("%s:/root/workspace/fuzzdrivergpt/jdk-19.0.2" % (cfgs.FDGPT_JDK))

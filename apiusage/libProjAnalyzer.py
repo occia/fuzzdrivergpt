@@ -275,8 +275,10 @@ def is_existing_fuzz_drivers(cfg, filename, antlr_rslt):
 def get_sourcegraph_usage_functions(cfg, analyzed_apis, all_apis):
 	api_usages = {}
 
-	merged_results = {}
+	if not os.path.exists(cfg.sgusagejson):
+		return api_usages
 
+	merged_results = {}
 	# get merged search results
 	with open(cfg.sgusagejson) as f:
 		proj = cfg.target
@@ -380,6 +382,50 @@ def gen_usageid(all_usage_files, all_usage_funcs, usage_file, usage_func):
 
 	return "%s-%s" % (shortname, usage_func)
 
+def collect_api_usages(cfg, funcsig):
+	# 1. get APIs need to be analyzed
+	analyzed_apis = {}
+	#    + find exported func sig list using nm (useful in binary scenario, currently no use)
+	#funcs = find_exported_func_sig_list(self.cfg.binaries)
+	#print(funcs)
+	#    + filter the list using header analysis, currently we cover:
+	#      - c-style APIs
+	#      - public apis of classes 
+	#      - currently we didn't include the C++ template functions
+	api_funcs = refine_list_using_header_analysis(cfg)
+	#print(api_funcs)
+
+	if funcsig != None:
+		# if funcsig is specified, we only analyze that API
+		analyzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
+	else:
+		# if not specified, we analyze all APIs found in headers
+		analyzed_apis = api_funcs
+
+	# 2. get functions used these apis from the project code
+	api_self_usages = get_usage_functions(cfg, analyzed_apis, api_funcs)
+	api_sg_usages = get_sourcegraph_usage_functions(cfg, analyzed_apis, api_funcs)
+	api_usages = merge_example_usages( [ api_sg_usages, api_self_usages ] )
+
+	return merge_ana_results(api_funcs, api_usages)
+
+def merge_ana_results(api_funcs, api_usages):
+	results = {}
+	for api_sig, api_info in api_funcs.items():
+
+		# api basics
+		results[api_sig] = { 'funcsig': api_sig, 'apiinfo' : api_info, 'apidoc' : [], 'examples' : [] }
+
+		# api doc
+		if ('raw_comment' in api_info) and (api_info['raw_comment'] != 'None'):
+			results[api_sig]['apidoc'].append(api_info['raw_comment'])
+
+		# api example snippets
+		if api_sig in api_usages:
+			results[api_sig]['examples'].extend(api_usages[api_sig])
+
+	return results
+
 class BaseAnalyzer:
 
 	def __init__(self, cfg):
@@ -410,48 +456,24 @@ class BaseAnalyzer:
 		# 0. install the deps
 		self.setup_java_env_for_antlr()
 
-		# 1. get params
-		funcsig = params['funcsig'] if 'funcsig' in params else None
+		anamode = params['anamode']
+		if anamode == 'listapisfromheaders':
+			api_funcs = refine_list_using_header_analysis(self.cfg)
+			return merge_ana_results(api_funcs, {})
 
-		# 2. get APIs need to be analyzed
-		analyzed_apis = {}
-		#    + find exported func sig list using nm (useful in binary scenario, currently no use)
-		#funcs = find_exported_func_sig_list(self.cfg.binaries)
-		#print(funcs)
-		#    + filter the list using header analysis, currently we cover:
-		#      - c-style APIs
-		#      - public apis of classes 
-		#      - currently we didn't include the C++ template functions
-		api_funcs = refine_list_using_header_analysis(self.cfg)
-		#print(api_funcs)
+		elif anamode == 'listapisfromnm':
+			# WARN: currently not use, the sig seems problematic?
+			funcs = find_exported_func_sig_list(self.cfg.binaries)
+			#print(funcs)
+			return merge_ana_results({apisig : {} for apisig in funcs}, {})
 
-		if funcsig != None:
-			# if funcsig is specified, we only analyze that API
-			analyzed_apis = { funcsig : api_funcs[funcsig] } if funcsig in api_funcs else {}
+		elif anamode == 'collectapiusage':
+			funcsig = params['funcsig'] if 'funcsig' in params else None
+			results = collect_api_usages(self.cfg, funcsig)
+			return results
+		
 		else:
-			# if not specified, we analyze all APIs found in headers
-			analyzed_apis = api_funcs
-
-		# 3. get functions used these apis from the project code
-		api_self_usages = get_usage_functions(self.cfg, analyzed_apis, api_funcs)
-		api_sg_usages = get_sourcegraph_usage_functions(self.cfg, analyzed_apis, api_funcs)
-		api_usages = merge_example_usages( [ api_sg_usages, api_self_usages ] )
-
-		results = {}
-		for api_sig, api_info in api_funcs.items():
-
-			# api basics
-			results[api_sig] = { 'funcsig': api_sig, 'apiinfo' : api_info, 'apidoc' : [], 'examples' : [] }
-
-			# api doc
-			if api_info['raw_comment'] != 'None':
-				results[api_sig]['apidoc'].append(api_info['raw_comment'])
-
-			# api example snippets
-			if api_sig in api_usages:
-				results[api_sig]['examples'].extend(api_usages[api_sig])
-
-		return results
+			raise Exception('Unknown anamode %s' % (anamode))
 
 def main():
 	pickleCfg, paramfile = sys.argv[1], sys.argv[2]

@@ -5,6 +5,7 @@ logger = logging.getLogger(__name__)
 
 from apiusage.libProjAnalyzer import merge_example_usages
 from apiusage.libContainerWrapper import ContainerAnalyzer
+from apiusage import libSourceGraph
 
 # this is the interface for building/caching/retrieving the API usage related information
 # currently it contains four types of usage information:
@@ -40,7 +41,12 @@ class APIUsage:
 			self.examples = merged_examples[self.funcsig]
 
 	@staticmethod
-	def buildAPIUsages(targetcfg, funcsig=None):
+	def load_ana_result(targetcfg):
+		with open(targetcfg.projanaresult, 'r') as f:
+			return json.load(f)
+
+	@staticmethod
+	def buildAPIUsages(targetcfg, funcsig=None, skipsgcrawl=False):
 		'''
 		if funcsig is None, build all API usages
 		'''
@@ -59,20 +65,27 @@ class APIUsage:
 		# 3. usage caching (cache the usages in the local storage)
 		# both 1 and 2 can be extended for more ways of collection and extraction
 
+		analyzer = ContainerAnalyzer(targetcfg)
+
 		# 1. inputs collection
-		# usage snippets from sourcegraph
-		pass
+		if not skipsgcrawl:
+			# get api list
+			analyzer.analyze_wrap({'anamode': 'listapisfromheaders'}, debug=False)
+			apilist = list(analyzer.get_ana_results().keys())
+			if funcsig != None:
+				if funcsig not in apilist:
+					logger.error('funcsig %s not in apilist' % funcsig)
+					exit(1)
+				apilist = [ funcsig ]
+
+			# crawl usage snippets from sourcegraph
+			libSourceGraph.crawl_sg_usage(targetcfg.target, apilist, targetcfg.sgusagejson)
 
 		# 2. usage extraction
-		analyzer = ContainerAnalyzer(targetcfg)
-		analyzer.analyze_wrap({'funcsig': funcsig}, debug=False)
-
-		results = None
-		with open(targetcfg.projanaresult, 'r') as f:
-			results = json.load(f)
+		analyzer.analyze_wrap({'anamode': 'collectapiusage', 'funcsig': funcsig}, debug=False)
 
 		apiusages = []
-		for api_sig, api_info in results.items():
+		for api_sig, api_info in analyzer.get_ana_results().items():
 			apiusages.append(APIUsage(api_sig, api_info['apiinfo'], api_info['apidoc'], api_info['examples']))
 
 		return apiusages
