@@ -48,7 +48,7 @@ def handleSingleResult(query_rslt):
 	query_rslt['result']['raw_solutions'] = raw_solutions
 	query_rslt['result']['solutions'] = fixed_solutions
 
-def handleChatGPTResult(input):
+def handleGPTResult(input):
 	for query_rslt in input:
 		handleSingleResult(query_rslt)
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 	input = None
 	with open(inputjson, 'r') as f:
 		input = json.load(f)
-		handleChatGPTResult(input)
+		handleGPTResult(input)
 
 	with open(inputjson, 'w') as f:
 		json.dump(input, f, indent=2, sort_keys=True)

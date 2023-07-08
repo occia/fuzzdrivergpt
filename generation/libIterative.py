@@ -18,7 +18,7 @@ from apiusage.libAPIUsage import APIUsage
 from validation import libVR
 from generation import libPrompt
 from generation import libQuery
-from generation import handleChatGPTResult
+from generation import libGPTResultPostProcess
 
 import logging
 logger = logging.getLogger(__name__)
@@ -223,7 +223,7 @@ class IterativeQueryRecord:
 				query['result'] = libQuery.resilient_wrapper_query(self.model, query['query'])
 				if query['result']['status'] != 'FinishedNormally':
 					failed_ids.append(query_id)
-				handleChatGPTResult.handleSingleResult(query)
+				libGPTResultPostProcess.handleSingleResult(query)
 
 				if query['result']['status'] != 'ERRLONGQUERY':
 					# query via APIKEY do not need extra wait time
