@@ -3,7 +3,7 @@
 ## Query strategies
 
 A query strategy defines a way to generate prompt(s). The following table lists all strategies integrated into `fuzzdrivergpt` and you can pick one depending on what you have.
-The strategies of `fuzzdrivergpt` are motivated by the findings of our recent [research](https://github.com/occia/fuzzdrivergpt/tree/main/doc/research_paper.md) on the pros and cons of various LLM-based fuzz driver generation strategies. 
+The strategies of `fuzzdrivergpt` are motivated by the findings of our recent [research](https://arxiv.org/abs/2307.12469) on the pros and cons of various LLM-based fuzz driver generation strategies. 
 In our evaluation, the iterative strategies have best performance but their potential GPT costs can be high.
 
 |Query Strategy| API Decl| API Doc| Example Code| Iterative Fix|
