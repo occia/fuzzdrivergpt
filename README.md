@@ -92,6 +92,7 @@ All results and details of prompts, validations, and driver codes can be found i
 
 # License
 
+Note that this tool is for educational purposes and the author does not condone any illegal use.
 MIT License, see LICENSE.txt.
 
 
